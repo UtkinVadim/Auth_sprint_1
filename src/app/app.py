@@ -25,10 +25,8 @@ def main():
     db.create_all()  # по идее одноразовая операция чтобы создать таблицы
 
     # подключение ресурсов, можно перенести в api/v1/users
-    api_app.add_resource(api.v1.user.UserInfo, url_generator(postfix='user_info'))
-    api_app.add_resource(api.v1.user.UserRegistration, url_generator(postfix='user'))
-
     api_app.add_resource(api.v1.user.UserSignUp, url_generator(postfix='user/sign_up'))
+    api_app.add_resource(api.v1.user.UserSignIn, url_generator(postfix='user/sign_in'))
     app.run()
 
 
