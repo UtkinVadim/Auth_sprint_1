@@ -24,8 +24,8 @@ services:
   postgres_auth:
     image: postgres:13
     container_name: postgres_auth
-    volumes:
-      - postgres_auth:/var/lib/postgresql/data
+#    volumes:
+#      - postgres_auth:/var/lib/postgresql/data
     env_file:
       - .env
     ports:
@@ -34,8 +34,8 @@ services:
       - movies-network
 
 
-volumes:
-  postgres_auth:
+#volumes:
+#  postgres_auth:
 
 networks:
   movies-network:
