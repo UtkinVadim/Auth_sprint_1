@@ -65,3 +65,16 @@ def check_user(user_fields):
     if user.password == password:
         return user
     return
+
+
+def log_sign_in(user, fingerprint):
+    """
+    Создаёт запись в базе об успешном логине пользователя
+
+    :param user:
+    :param fingerprint:
+    :return:
+    """
+    log = LoginHistoryModel(fingerprint=fingerprint, user_id=user.id)
+    db.session.add(log)
+    db.session.commit()
