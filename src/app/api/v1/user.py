@@ -43,18 +43,25 @@ class UserRegistration(Resource):
 
 
 class UserSignUp(Resource):
-    @marshal_with(user_signup_fields)
+    #@marshal_with(user_signup_fields)
     def post(self):
         args = user_info_parser.parse_args()
-        user = create_user(args)
-        return user
+        create_user(args)
+        # FIXME добавить обработку проверки уникальности логина
+        return {'message': 'user created successfully'}, 200
 
 
 class UserSignIn(Resource):
-    @marshal_with(user_signin_fields)
+    #@marshal_with(user_signin_fields)
     def post(self):
         args = login_pass_parser.parse_args()
         user = check_user(args)
+        print(user)
         if user:
+            print('inner')
             log_sign_in(user, args['fingerprint'])
-        return user
+        else:
+            print('else')
+            return {'no': 'such user'}, 403  # FIXME создать отдельный эксепшн
+        return {'hello': 'world'}, 201
+        #user
