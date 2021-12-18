@@ -52,6 +52,7 @@ def create_user(user_fields):
     :return:
     """
     user = Users(**user_fields)
+    # FIXME ДОбавить проверку на существование пользователя в базе
     db.session.add(user)
     db.session.commit()
     return user
@@ -62,8 +63,10 @@ def check_user(user_fields):
     login = user_fields['login']
     password = user_fields['password']
     user = Users.query.filter_by(login=login).one_or_none()
-    if user.password == password:
-        return user
+    if user:
+        if user.password == password:
+            return user
+        return
     return
 
 
