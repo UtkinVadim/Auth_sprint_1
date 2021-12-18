@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy.dialects.postgresql import UUID, BOOLEAN, INTEGER
+from sqlalchemy.dialects.postgresql import UUID, BOOLEAN
 
 from db import db
 
@@ -55,3 +55,13 @@ def create_user(user_fields):
     db.session.add(user)
     db.session.commit()
     return user
+
+
+def check_user(user_fields):
+    # FIXME здесь должна быть реализована проверка пароля, при условии что пароль мы в открытом виде не храним
+    login = user_fields['login']
+    password = user_fields['password']
+    user = Users.query.filter_by(login=login).one_or_none()
+    if user.password == password:
+        return user
+    return
