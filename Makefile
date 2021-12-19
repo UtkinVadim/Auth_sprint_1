@@ -11,3 +11,14 @@ dbs:
 down:
 	docker compose down
 
+init_db:
+	cd src && alembic upgrade head
+
+migrations:
+	cd src && alembic revision --autogenerate
+
+run:
+	cd src && python run.py
+
+run_debug:
+	cd src && python run.py -d
