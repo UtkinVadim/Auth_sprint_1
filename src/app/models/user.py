@@ -1,5 +1,5 @@
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
 
 from app import db
 from sqlalchemy.dialects.postgresql import UUID, BOOLEAN
@@ -28,12 +28,20 @@ class User(db.Model):
         """
         user = User(**user_fields)
         # FIXME ДОбавить проверку на существование пользователя в базе
+        if cls.is_user_exist(user):
+            return # FIXME Что должен возвращать если пользователь уже есть?
         db.session.add(user)
         db.session.commit()
         return user
 
     @classmethod
     def check_user(cls, user_fields: dict):
+        """
+        Идентификация и аутентификация пользователя
+
+        :param user_fields:
+        :return:
+        """
         # FIXME здесь должна быть реализована проверка пароля, при условии что пароль мы в открытом виде не храним
         login = user_fields['login']
         password = user_fields['password']
@@ -46,3 +54,18 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.login} {self.id}>'
+
+    @classmethod
+    def is_user_exist(cls, user_fields: dict):
+        """
+        Проверка на существование пользователя
+
+        :param user_fields:
+        :return:
+        """
+        login = user_fields['login']
+        user = User.query.filter_by(login=login).one_or_none()
+        if user:
+            return True
+        return False
+
