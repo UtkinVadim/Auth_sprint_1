@@ -1,6 +1,8 @@
+from uuid import uuid4
+from typing import List, Dict
+
 from sqlalchemy.dialects.postgresql import UUID
 
-from uuid import uuid4
 from app import db
 
 
@@ -13,13 +15,18 @@ class Role(db.Model):
         return f'id: {self.id}, title: {self.title}'
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls) -> List[Dict[str, str]]:
+        """
+        Возвращает полный список ролей
+
+        :return:
+        """
         roles = cls.query.all()
         roles_dict = [{'id': str(role.id), 'title': str(role.title)} for role in roles]
         return roles_dict
 
     @classmethod
-    def is_role_exist(cls, role_fields: dict):
+    def is_role_exist(cls, role_fields: dict) -> bool:
         """
         Проверка на существование роли
 
@@ -33,8 +40,38 @@ class Role(db.Model):
         return False
 
     @classmethod
-    def create(cls, role_fields):
+    def create(cls, role_fields) -> db.Model:
+        """
+        Создаёт новую роль
+
+        :param role_fields:
+        :return:
+        """
         role = Role(**role_fields)
         db.session.add(role)
         db.session.commit()
         return role
+
+    @classmethod
+    def delete(cls, role):
+        """
+        Удаляет роль
+
+        :param role:
+        :return:
+        """
+        db.session.delete(role)
+        db.session.commit()
+
+    @classmethod
+    def update(cls, role_fields: dict):
+        """
+        Обновление информации о роли
+
+        :param role_fields:
+        :return:
+        """
+        current_title = role_fields['title']
+        role = Role.query.filter_by(title=current_title).one_or_none()
+        role.title = role_fields['new_title']
+        db.session.commit()
