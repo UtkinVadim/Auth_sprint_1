@@ -13,5 +13,5 @@ api = Api(app)
 from app import views, models
 
 api.add_resource(views.HelloWorld, '/')
-#api.add_resource(views.user.UserSignIn, '/api/v1/user/sign_in')
-#api.add_resource(views.user.UserSignUp, '/api/v1/user/sign_up')
+api.add_resource(views.user.UserSignIn, '/api/v1/user/sign_in')
+api.add_resource(views.user.UserSignUp, '/api/v1/user/sign_up')
