@@ -27,9 +27,8 @@ class User(db.Model):
         :return:
         """
         user = User(**user_fields)
-        # FIXME ДОбавить проверку на существование пользователя в базе
         if cls.is_user_exist(user_fields):
-            return # FIXME Что должен возвращать если пользователь уже есть?
+            return  # FIXME Что должен возвращать если пользователь уже есть?
         db.session.add(user)
         db.session.commit()
         return user

@@ -1,7 +1,8 @@
 import logging
 
-from app import models
 from flask_restful import fields, reqparse, Resource
+
+from app import models
 
 logger = logging.getLogger(__name__)
 
@@ -30,16 +31,6 @@ user_signup_fields = {
     'email': fields.String,
     'password': fields.String,
 }
-
-
-class UserInfo(Resource):
-    def get(self):
-        return {'message': 'user info'}
-
-
-class UserRegistration(Resource):
-    def post(self):
-        return {'message': 'User registration'}
 
 
 class UserSignUp(Resource):
