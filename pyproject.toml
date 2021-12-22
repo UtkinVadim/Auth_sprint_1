@@ -12,6 +12,10 @@ Flask-JWT-Extended = "^4.3.1"
 psycopg2-binary = "^2.9.2"
 Flask-SQLAlchemy = "^2.5.1"
 Flask-RESTful = "^0.3.9"
+python-dotenv = "^0.19.2"
+alembic = "^1.7.5"
+aiohttp = "^3.8.1"
+multidict = "^5.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "21.10b0"
