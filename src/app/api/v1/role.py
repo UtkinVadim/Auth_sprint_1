@@ -1,5 +1,6 @@
 import logging
 
+from flask_jwt_extended import jwt_required
 from flask_restful import reqparse, Resource
 
 from app import models
@@ -19,6 +20,7 @@ role_editor_parser.add_argument('new_title', dest='new_title', type=str, locatio
 
 class Role(Resource):
     # FIXME возвращаемые значения возможно стоит вынести в отдельный пакет
+    @jwt_required()
     def post(self):
         args = role_parser.parse_args()
         if models.Role.is_role_exist(args):
@@ -26,10 +28,12 @@ class Role(Resource):
         models.Role.create(args)
         return {'message': 'role created'}, 201
 
+    @jwt_required()
     def get(self):
         roles = models.Role.get_all()
         return {'roles': roles}, 200
 
+    @jwt_required()
     def delete(self):
         args = role_parser.parse_args()
         title = args['title']
@@ -39,6 +43,7 @@ class Role(Resource):
         models.Role.delete(role)
         return {'message': 'role deleted'}, 200
 
+    @jwt_required()
     def patch(self):
         args = role_editor_parser.parse_args()
         role = models.Role.is_role_exist(args)

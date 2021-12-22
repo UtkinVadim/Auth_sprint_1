@@ -1,13 +1,17 @@
 from flask import Flask
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
+from config import JWT_SECRET_KEY
 
 app.config.from_object("config")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 db = SQLAlchemy(app)
+jwt = JWTManager(app)
 api_app = Api(app)
 
 from app import models

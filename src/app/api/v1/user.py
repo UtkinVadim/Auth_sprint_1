@@ -3,6 +3,9 @@ import logging
 from flask_restful import fields, reqparse, Resource
 
 from app import models
+from flask import jsonify
+
+from flask_jwt_extended import create_access_token
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +38,7 @@ user_signup_fields = {
 
 class UserSignUp(Resource):
     def post(self):
+        # FIXME нужен ли редирект после создания пользователя на sign-in?
         args = user_info_parser.parse_args()
         user = models.User.is_user_exist(args)
         if user:
@@ -51,4 +55,6 @@ class UserSignIn(Resource):
             models.LoginHistory.log_sign_in(user, args['fingerprint'])
         else:
             return {'message': 'invalid credentials'}, 401
-        return {'message': 'welcome'}, 200
+        access_token = create_access_token(identity=user.login)
+        print(access_token)
+        return jsonify(access_token=access_token)
