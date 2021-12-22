@@ -1,12 +1,12 @@
 import logging
+from http import HTTPStatus
 
+from flask import jsonify
+from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import fields, reqparse, Resource
 
 from app import models
-from flask import jsonify
-from http import HTTPStatus
-
-from flask_jwt_extended import create_access_token
 
 logger = logging.getLogger(__name__)
 
@@ -57,5 +57,14 @@ class UserSignIn(Resource):
         else:
             return {'message': 'invalid credentials'}, HTTPStatus.UNAUTHORIZED
         access_token = create_access_token(identity=user.login)
-        print(access_token)
-        return jsonify(access_token=access_token)
+        refresh_token = create_refresh_token(identity=user.login)
+        return jsonify(access_token=access_token, refresh_token=refresh_token)
+
+
+class RefreshToken(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        identity = get_jwt_identity()
+        access_token = create_access_token(identity=identity)
+        refresh_token = create_refresh_token(identity=identity)
+        return jsonify(access_token=access_token, refresh_token=refresh_token)
