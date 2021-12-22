@@ -23,7 +23,7 @@ class User(db.Model):
     is_active = db.Column(BOOLEAN, default=True)
 
     @classmethod
-    def create(cls, user_fields: dict):
+    def create(cls, user_fields: dict) -> Optional[db.Model]:
         """
         Создаёт пользователя в базе
 
@@ -33,7 +33,7 @@ class User(db.Model):
         user = User(**user_fields)
         user.password = cls.password_hasher(user_fields['password'], SALT)
         if cls.is_user_exist(user_fields):
-            return  # FIXME Что должен возвращать если пользователь уже есть?
+            return
         db.session.add(user)
         db.session.commit()
         return user
