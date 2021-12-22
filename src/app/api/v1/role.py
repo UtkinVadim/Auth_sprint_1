@@ -2,6 +2,7 @@ import logging
 
 from flask_jwt_extended import jwt_required
 from flask_restful import reqparse, Resource
+from http import HTTPStatus
 
 from app import models
 
@@ -19,19 +20,20 @@ role_editor_parser.add_argument('new_title', dest='new_title', type=str, locatio
 
 
 class Role(Resource):
+    # FIXME не каждый аутентифицированный пользователь должен иметь возможность управлять ролями
     # FIXME возвращаемые значения возможно стоит вынести в отдельный пакет
     @jwt_required()
     def post(self):
         args = role_parser.parse_args()
         if models.Role.is_role_exist(args):
-            return {'message': 'role already exists'}, 409
+            return {'message': 'role already exists'}, HTTPStatus.CONFLICT
         models.Role.create(args)
-        return {'message': 'role created'}, 201
+        return {'message': 'role created'}, HTTPStatus.CREATED
 
     @jwt_required()
     def get(self):
         roles = models.Role.get_all()
-        return {'roles': roles}, 200
+        return {'roles': roles}, HTTPStatus.OK
 
     @jwt_required()
     def delete(self):
@@ -39,15 +41,15 @@ class Role(Resource):
         title = args['title']
         role = models.Role.query.filter_by(title=title).one_or_none()
         if not role:
-            return {'message': 'role does not exist'}, 409
+            return {'message': 'role does not exist'}, HTTPStatus.CONFLICT
         models.Role.delete(role)
-        return {'message': 'role deleted'}, 200
+        return {'message': 'role deleted'}, HTTPStatus.OK
 
     @jwt_required()
     def patch(self):
         args = role_editor_parser.parse_args()
         role = models.Role.is_role_exist(args)
         if not role:
-            return {'message': 'role does not exist'}, 409
+            return {'message': 'role does not exist'}, HTTPStatus.CONFLICT
         models.Role.update(args)
-        return {'message': 'role updated'}, 200
+        return {'message': 'role updated'}, HTTPStatus.OK

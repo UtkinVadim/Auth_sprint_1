@@ -4,6 +4,7 @@ from flask_restful import fields, reqparse, Resource
 
 from app import models
 from flask import jsonify
+from http import HTTPStatus
 
 from flask_jwt_extended import create_access_token
 
@@ -42,9 +43,9 @@ class UserSignUp(Resource):
         args = user_info_parser.parse_args()
         user = models.User.is_user_exist(args)
         if user:
-            return {'message': 'choose another login'}, 409
+            return {'message': 'choose another login'}, HTTPStatus.CONFLICT
         models.User.create(args)
-        return {'message': 'user created successfully'}, 200
+        return {'message': 'user created successfully'}, HTTPStatus.OK
 
 
 class UserSignIn(Resource):
@@ -54,7 +55,7 @@ class UserSignIn(Resource):
         if user:
             models.LoginHistory.log_sign_in(user, args['fingerprint'])
         else:
-            return {'message': 'invalid credentials'}, 401
+            return {'message': 'invalid credentials'}, HTTPStatus.UNAUTHORIZED
         access_token = create_access_token(identity=user.login)
         print(access_token)
         return jsonify(access_token=access_token)
