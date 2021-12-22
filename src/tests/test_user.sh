@@ -14,7 +14,7 @@ echo 'trying to create user'
 curl http://127.0.0.1:5000/api/v1/user/sign_up -XPOST -d "${USER_CREATE_INFO}" -H 'Content-Type: application/json'
 echo '***'
 echo 'trying to sign_in'
-TOKEN=$(curl http://127.0.0.1:5000/api/v1/user/sign_in -XPOST -d "${USER_LOGIN_INFO}" -H 'Content-Type: application/json' | tr '{":"}' '\n' | grep -v access_token | grep -ve '^$')
+TOKEN=$(curl http://127.0.0.1:5000/api/v1/user/sign_in -XPOST -d "${USER_LOGIN_INFO}" -H 'Content-Type: application/json' | tr '{":"}' '\n' | grep -v access_token | grep -ve '^$' | head -1)
 echo ${TOKEN}
 
 
