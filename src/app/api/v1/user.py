@@ -3,10 +3,11 @@ from http import HTTPStatus
 
 from flask import jsonify
 from flask_jwt_extended import create_access_token, create_refresh_token
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt, get_jti
 from flask_restful import fields, reqparse, Resource
+from config import JWT_REFRESH_TOKEN_EXPIRES
 
-from app import models
+from app import models, jwt_whitelist
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,7 @@ user_signup_fields = {
 class UserSignUp(Resource):
     def post(self):
         # FIXME нужен ли редирект после создания пользователя на sign-in?
+        # FIXME создавать ли сразу токены?
         args = user_info_parser.parse_args()
         user = models.User.is_user_exist(args)
         if user:
@@ -58,6 +60,8 @@ class UserSignIn(Resource):
             return {'message': 'invalid credentials'}, HTTPStatus.UNAUTHORIZED
         access_token = create_access_token(identity=user.login)
         refresh_token = create_refresh_token(identity=user.login)
+        jti = get_jti(refresh_token)
+        jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
         return jsonify(access_token=access_token, refresh_token=refresh_token)
 
 
@@ -67,4 +71,14 @@ class RefreshToken(Resource):
         identity = get_jwt_identity()
         access_token = create_access_token(identity=identity)
         refresh_token = create_refresh_token(identity=identity)
+        jti = get_jti(refresh_token)
+        jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
         return jsonify(access_token=access_token, refresh_token=refresh_token)
+
+
+class Logout(Resource):
+    @jwt_required()
+    def post(self):
+        jti = get_jwt()["jti"]
+        jwt_whitelist.delete(jti)
+        return jsonify(msg="Access token revoked")
