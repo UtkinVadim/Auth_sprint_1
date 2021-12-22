@@ -89,4 +89,4 @@ class User(db.Model):
 
         password_salted_hash = hashlib.pbkdf2_hmac(hash_name, password.encode(encoding), salt.encode(encoding),
                                                    iterations)
-        return password_salted_hash
+        return str(password_salted_hash)
