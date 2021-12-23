@@ -1,12 +1,15 @@
-from flask import Flask
-from flask_jwt_extended import JWTManager
+from functools import wraps
+
+from flask import Flask, jsonify
+from flask_jwt_extended import JWTManager, get_jwt, verify_jwt_in_request
+from http import HTTPStatus
 
 app = Flask(__name__)
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 import redis
-from config import JWT_SECRET_KEY, JWT_ACCESS_TOKEN_EXPIRES, JWT_REFRESH_TOKEN_EXPIRES, REDIS_HOST, REDIS_PORT
+from config import REDIS_HOST, REDIS_PORT
 
 app.config.from_object("config")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # гуглани
@@ -14,8 +17,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # гуглани
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-
 from app import models
+
+
 @jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload) -> bool:
     """
@@ -37,6 +41,27 @@ def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     user = models.User.query.filter_by(login=identity).one_or_none()
     return user
+
+
+def jwt_with_role_required(role: str):
+    """
+    Декоратор выполняющий функцию проверки авторизации
+    За основу взят код из доки: https://flask-jwt-extended.readthedocs.io/en/stable/custom_decorators/
+
+    :return:
+    """
+
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            claims = get_jwt()
+            if claims[role]:
+                return fn(*args, **kwargs)
+            else:
+                return jsonify(message="you shall not pass"), HTTPStatus.FORBIDDEN
+        return decorator
+    return wrapper
 
 
 api_app = Api(app)
