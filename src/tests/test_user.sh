@@ -44,3 +44,6 @@ echo '***'
 echo 'get all roles'
 curl http://127.0.0.1:5000/api/v1/access/role -XGET -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}"
 echo '***'
+echo 'get history'
+curl http://127.0.0.1:5000/api/v1/user/history -XGET -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}"
+echo '***'

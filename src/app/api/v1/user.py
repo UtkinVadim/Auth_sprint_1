@@ -70,6 +70,14 @@ class UserSignIn(Resource):
         return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)
 
 
+class UserHistory(Resource):
+    @jwt_required()
+    def get(self):
+        user = get_current_user()
+        events = models.LoginHistory.get_user_events(user_id=user.id)
+        return make_response(jsonify(events=events), HTTPStatus.OK)
+
+
 class RefreshToken(Resource):
     @jwt_required(refresh=True)
     def post(self):

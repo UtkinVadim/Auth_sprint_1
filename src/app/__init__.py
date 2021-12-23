@@ -50,5 +50,6 @@ api_app.add_resource(user.UserSignUp, '/api/v1/user/sign_up')
 api_app.add_resource(user.RefreshToken, '/api/v1/user/refresh')
 api_app.add_resource(user.Logout, '/api/v1/user/sign_out')
 api_app.add_resource(user.ChangeUserParams, '/api/v1/user/change')
+api_app.add_resource(user.UserHistory, '/api/v1/user/history')
 
 api_app.add_resource(role.Role, '/api/v1/access/role')
