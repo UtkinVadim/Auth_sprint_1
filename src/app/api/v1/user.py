@@ -2,12 +2,13 @@ import logging
 from http import HTTPStatus
 
 from flask import jsonify
+from flask import make_response
 from flask_jwt_extended import create_access_token, create_refresh_token
-from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt, get_jti
+from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt, get_jti, get_current_user
 from flask_restful import fields, reqparse, Resource
-from config import JWT_REFRESH_TOKEN_EXPIRES
 
 from app import models, jwt_whitelist
+from config import JWT_REFRESH_TOKEN_EXPIRES
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,12 @@ login_pass_parser.add_argument('User-Agent', dest='fingerprint', location='heade
 
 user_signin_fields = {'login': fields.String, 'password': fields.String, 'fingerprint': fields.String}
 
+user_params_parser = reqparse.RequestParser()
+user_params_parser.add_argument('new_login', dest='new_login', location='json', required=True, type=str,
+                                help='The user\'s login')
+user_params_parser.add_argument('new_password', dest='new_password', type=str, location='json', required=True,
+                                help='The user\'s password')
+
 user_signup_fields = {
     'id': fields.String,
     'first_name': fields.String,
@@ -40,14 +47,12 @@ user_signup_fields = {
 
 class UserSignUp(Resource):
     def post(self):
-        # FIXME нужен ли редирект после создания пользователя на sign-in?
-        # FIXME создавать ли сразу токены?
         args = user_info_parser.parse_args()
         user = models.User.is_user_exist(args)
         if user:
             return {'message': 'choose another login'}, HTTPStatus.CONFLICT
         models.User.create(args)
-        return {'message': 'user created successfully'}, HTTPStatus.OK
+        return make_response(jsonify(message='user created successfully'), HTTPStatus.OK)
 
 
 class UserSignIn(Resource):
@@ -62,7 +67,7 @@ class UserSignIn(Resource):
         refresh_token = create_refresh_token(identity=user.login)
         jti = get_jti(refresh_token)
         jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
-        return jsonify(access_token=access_token, refresh_token=refresh_token)
+        return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)
 
 
 class RefreshToken(Resource):
@@ -81,4 +86,13 @@ class Logout(Resource):
     def post(self):
         jti = get_jwt()["jti"]
         jwt_whitelist.delete(jti)
-        return jsonify(msg="Access token revoked")
+        return jsonify(msg="Refresh token revoked")
+
+
+class ChangeUserParams(Resource):
+    @jwt_required()
+    def post(self):
+        args = user_params_parser.parse_args()
+        user = get_current_user()
+        models.User.change_user(user.id, args)
+        return {'message': 'login&password successfully changed'}, HTTPStatus.OK

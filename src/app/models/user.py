@@ -59,6 +59,24 @@ class User(db.Model):
         return f'<User {self.login} {self.id}>'
 
     @classmethod
+    def change_user(cls, user_id: str, user_fields: dict):
+        """
+        Смена логина и пароля у пользователя
+
+        :param user_id:
+        :param user_fields:
+        :return:
+        """
+        login = user_fields['new_login']
+        password = user_fields['new_password']
+        user = User.query.filter_by(id=user_id).one_or_none()
+        user.password = cls.password_hasher(password, SALT)
+        user.login = login
+        db.session.commit()
+
+
+
+    @classmethod
     def is_user_exist(cls, user_fields: dict) -> bool:
         """
         Проверка на существование пользователя
