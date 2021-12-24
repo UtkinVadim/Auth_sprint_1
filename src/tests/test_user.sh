@@ -67,3 +67,9 @@ echo '***'
 echo 'refresh admin token (revoked refresh token)'
 curl http://127.0.0.1:5000/api/v1/user/refresh -XGET -H 'Content-Type: application/json' -H "Authorization: Bearer ${REFRESH_TOKEN}"
 echo '***'
+echo 'add some-role role'
+curl http://127.0.0.1:5000/api/v1/user/role -XPOST -d '{"user_id": "c2c9b28d-2cd9-4bd4-8cd3-e0f7586055aa", "role_id": "8d6f1fd7-ed3c-4b2e-ad45-c917dc08fdaf"}' -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}"
+echo '***'
+echo 'delete some-role role'
+curl http://127.0.0.1:5000/api/v1/user/role -XDELETE -d '{"user_id": "c2c9b28d-2cd9-4bd4-8cd3-e0f7586055aa", "role_id": "8d6f1fd7-ed3c-4b2e-ad45-c917dc08fdaf"}' -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}"
+echo '***'
