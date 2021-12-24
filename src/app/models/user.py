@@ -1,5 +1,5 @@
 import hashlib
-from datetime import datetime
+import datetime
 from typing import Optional
 from uuid import uuid4
 
@@ -18,7 +18,7 @@ class User(db.Model):
     email = db.Column(db.String, nullable=False)
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
+    created_at = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     roles = db.relationship("Role", secondary="user_role", backref=db.backref("user_auth", lazy="dynamic"))
     is_active = db.Column(BOOLEAN, default=True)
 
