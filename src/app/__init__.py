@@ -1,8 +1,8 @@
 from functools import wraps
+from http import HTTPStatus
 
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager, get_jwt, verify_jwt_in_request
-from http import HTTPStatus
 
 app = Flask(__name__)
 
@@ -12,7 +12,6 @@ import redis
 from config import REDIS_HOST, REDIS_PORT
 
 app.config.from_object("config")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # гуглани
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
@@ -60,7 +59,9 @@ def jwt_with_role_required(role: str):
                 return fn(*args, **kwargs)
             else:
                 return jsonify(message="you shall not pass"), HTTPStatus.FORBIDDEN
+
         return decorator
+
     return wrapper
 
 
