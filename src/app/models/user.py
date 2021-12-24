@@ -76,18 +76,22 @@ class User(db.Model):
 
 
     @classmethod
-    def get_user_roles(cls, user_id: str):
-        user = User.query.filter_by(id=user_id).one_or_none()
-        roles = user.roles#.all()
-        print(roles)
-
-
-
+    def get_user_roles(cls, user_id: str = None, login: str = None):
+        if user_id:
+            user = User.query.filter_by(id=user_id).one_or_none()
+        elif login:
+            user = User.query.filter_by(login=login).one_or_none()
+        else:
+            return
+        roles = user.roles
+        roles_list = [role.title for role in roles]
+        roles_dict = {'roles': roles_list}
+        return roles_dict
 
     @classmethod
     def is_user_exist(cls, user_fields: dict) -> bool:
         """
-        Проверка на существование пользователя
+        Проверка на существование пользователя по логину
 
         :param user_fields:
         :return:
@@ -114,5 +118,12 @@ class User(db.Model):
         """
 
         password_salted_hash = hashlib.pbkdf2_hmac(hash_name, password.encode(encoding), salt.encode(encoding),
-                                                   iterations)
-        return str(password_salted_hash)
+                                                   iterations).hex()
+        return password_salted_hash
+
+    @classmethod
+    def add_role(cls, user_id, role_id):
+        user = User.query.filter_by(id=user_id).one_or_none()
+        user.user_role.role_id = role_id
+        db.session.commit()
+
