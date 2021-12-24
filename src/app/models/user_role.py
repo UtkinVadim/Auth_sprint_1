@@ -17,12 +17,26 @@ class UserRole(db.Model):
 
     @classmethod
     def add(cls, user_id, role_id):
+        """
+        Добавляет роль пользователю
+
+        :param user_id:
+        :param role_id:
+        :return:
+        """
         user_role = UserRole(user_id=user_id, role_id=role_id)
         db.session.add(user_role)
         db.session.commit()
 
     @classmethod
     def delete(cls, user_id, role_id):
+        """
+        Удаляет роль у пользователя
+
+        :param user_id:
+        :param role_id:
+        :return:
+        """
         user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).one_or_none()
         db.session.delete(user_role)
         db.session.commit()

@@ -77,6 +77,12 @@ class User(db.Model):
 
     @classmethod
     def get_user_roles(cls, user_id: str) -> Dict:
+        """
+        Возвращает словарь вида id пользователя -> список его ролей
+
+        :param user_id:
+        :return:
+        """
         user = User.query.filter_by(id=user_id).one_or_none()
         roles = user.roles
         roles_list = [role.title for role in roles]
