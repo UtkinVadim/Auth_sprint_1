@@ -49,6 +49,12 @@ def expired_token_callback(_jwt_header, jwt_data):
 
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
+    """
+    Callback на случай невалидной подписи. Возвращаeт ответ который уйдёт пользователю.
+
+    :param error:
+    :return:
+    """
     return make_response(jsonify({"message": "Signature verification failed."}), HTTPStatus.UNAUTHORIZED)
 
 
@@ -77,6 +83,13 @@ def missing_token_callback(error):
 
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
+    """
+    Callback для поиска пользователя. Нужен для корректной работы get_current_user.
+
+    :param _jwt_header:
+    :param jwt_data:
+    :return:
+    """
     identity = jwt_data["sub"]
     user = models.User.query.filter_by(id=identity).one_or_none()
     return user
@@ -108,9 +121,8 @@ def jwt_with_role_required(role: str):
 api_app = Api(app)
 jwt_whitelist = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
-from app.api.v1 import user, hello_world, role
+from app.api.v1 import user, role
 
-api_app.add_resource(hello_world.HelloWorld, '/')
 api_app.add_resource(user.UserSignIn, '/api/v1/user/sign_in')
 api_app.add_resource(user.UserSignUp, '/api/v1/user/sign_up')
 api_app.add_resource(user.RefreshToken, '/api/v1/user/refresh')
