@@ -35,6 +35,9 @@ user_params_parser.add_argument('new_login', dest='new_login', location='json', 
 user_params_parser.add_argument('new_password', dest='new_password', type=str, location='json', required=True,
                                 help='The user\'s password')
 
+role_parser = reqparse.RequestParser()
+role_parser.add_argument('role_id', dest='role_id', location='json', required=True, type=str, help='role_id')
+
 user_signup_fields = {
     'id': fields.String,
     'first_name': fields.String,
@@ -56,6 +59,15 @@ class UserSignUp(Resource):
 
 
 class UserSignIn(Resource):
+    """
+    Класс для ручки логина пользователя.
+    - параметры пользователя (логин, пароль...) находятся в args
+    - с помощью args делается идентификация и аутентификация пользователя
+    - если успешно, то логируется логин пользователя
+    - из базы берутся роли пользователя
+    - создаются access и refresh токены. В access токен кладутся роли пользователя
+    - refresh токен кладётся в in-memory базу
+    """
     def post(self):
         args = login_pass_parser.parse_args()
         user = models.User.check_user(args)
@@ -63,9 +75,8 @@ class UserSignIn(Resource):
             models.LoginHistory.log_sign_in(user, args['fingerprint'])
         else:
             return {'message': 'invalid credentials'}, HTTPStatus.UNAUTHORIZED
-        user_roles_id_list = models.User.get_user_roles(user.id)
-        print(user_roles_id_list)
-        access_token = create_access_token(identity=user.login)#, additional_claims=user_roles_id_list)
+        user_roles_dict = models.User.get_user_roles(user_id=user.id)
+        access_token = create_access_token(identity=user.login, additional_claims=user_roles_dict)
         refresh_token = create_refresh_token(identity=user.login)
         jti = get_jti(refresh_token)
         jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
@@ -82,13 +93,16 @@ class UserHistory(Resource):
 
 class RefreshToken(Resource):
     @jwt_required(refresh=True)
-    def post(self):
+    def get(self):
         identity = get_jwt_identity()
-        access_token = create_access_token(identity=identity)
+        old_jti = get_jwt()['jti']
+        jwt_whitelist.delete(old_jti)
+        user_roles_dict = models.User.get_user_roles(login=identity)
+        access_token = create_access_token(identity=identity, additional_claims=user_roles_dict)
         refresh_token = create_refresh_token(identity=identity)
         jti = get_jti(refresh_token)
         jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
-        return jsonify(access_token=access_token, refresh_token=refresh_token)
+        return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)
 
 
 class Logout(Resource):
@@ -96,7 +110,7 @@ class Logout(Resource):
     def post(self):
         jti = get_jwt()["jti"]
         jwt_whitelist.delete(jti)
-        return jsonify(msg="Refresh token revoked")
+        return jsonify(message="Refresh token revoked")
 
 
 class ChangeUserParams(Resource):
@@ -106,3 +120,19 @@ class ChangeUserParams(Resource):
         user = get_current_user()
         models.User.change_user(user.id, args)
         return {'message': 'login&password successfully changed'}, HTTPStatus.OK
+
+
+class Role(Resource):
+    @jwt_required()
+    def post(self):
+        args = role_parser.parse_args()
+        user = get_current_user()
+        models.User.add_role(user.id, args['role_id'])
+        return {'message': 'role added'}, HTTPStatus.OK
+
+    @jwt_required()
+    def delete(self):
+        args = role_parser.parse_args()
+        user = get_current_user()
+        models.User.delete_role(user.id, args['role_id'])
+        return {'message': 'role deleted'}, HTTPStatus.OK
