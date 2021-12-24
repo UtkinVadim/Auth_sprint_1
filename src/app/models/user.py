@@ -1,6 +1,6 @@
 import hashlib
 import datetime
-from typing import Optional
+from typing import Optional, Dict
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID, BOOLEAN
@@ -41,7 +41,7 @@ class User(db.Model):
     @classmethod
     def check_user(cls, user_fields: dict) -> Optional[db.Model]:
         """
-        Идентификация и аутентификация пользователя
+        Идентификация и аутентификация пользователя по логину-паролю
 
         :param user_fields:
         :return:
@@ -76,13 +76,8 @@ class User(db.Model):
 
 
     @classmethod
-    def get_user_roles(cls, user_id: str = None, login: str = None):
-        if user_id:
-            user = User.query.filter_by(id=user_id).one_or_none()
-        elif login:
-            user = User.query.filter_by(login=login).one_or_none()
-        else:
-            return
+    def get_user_roles(cls, user_id: str) -> Dict:
+        user = User.query.filter_by(id=user_id).one_or_none()
         roles = user.roles
         roles_list = [role.title for role in roles]
         roles_dict = {'roles': roles_list}

@@ -76,8 +76,8 @@ class UserSignIn(Resource):
         else:
             return {'message': 'invalid credentials'}, HTTPStatus.UNAUTHORIZED
         user_roles_dict = models.User.get_user_roles(user_id=user.id)
-        access_token = create_access_token(identity=user.login, additional_claims=user_roles_dict)
-        refresh_token = create_refresh_token(identity=user.login)
+        access_token = create_access_token(identity=user.id, additional_claims=user_roles_dict)
+        refresh_token = create_refresh_token(identity=user.id)
         jti = get_jti(refresh_token)
         jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
         return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)
@@ -97,7 +97,7 @@ class RefreshToken(Resource):
         identity = get_jwt_identity()
         old_jti = get_jwt()['jti']
         jwt_whitelist.delete(old_jti)
-        user_roles_dict = models.User.get_user_roles(login=identity)
+        user_roles_dict = models.User.get_user_roles(user_id=identity)
         access_token = create_access_token(identity=identity, additional_claims=user_roles_dict)
         refresh_token = create_refresh_token(identity=identity)
         jti = get_jti(refresh_token)
