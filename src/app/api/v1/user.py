@@ -63,7 +63,9 @@ class UserSignIn(Resource):
             models.LoginHistory.log_sign_in(user, args['fingerprint'])
         else:
             return {'message': 'invalid credentials'}, HTTPStatus.UNAUTHORIZED
-        access_token = create_access_token(identity=user.login)
+        user_roles_id_list = models.User.get_user_roles(user.id)
+        print(user_roles_id_list)
+        access_token = create_access_token(identity=user.login)#, additional_claims=user_roles_id_list)
         refresh_token = create_refresh_token(identity=user.login)
         jti = get_jti(refresh_token)
         jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
