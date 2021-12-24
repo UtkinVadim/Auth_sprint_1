@@ -7,7 +7,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt, get_jti, get_current_user
 from flask_restful import fields, reqparse, Resource
 
-from app import models, jwt_whitelist
+from app import models, jwt_whitelist, jwt_with_role_required
 from config import JWT_REFRESH_TOKEN_EXPIRES
 
 logger = logging.getLogger(__name__)
@@ -36,6 +36,7 @@ user_params_parser.add_argument('new_password', dest='new_password', type=str, l
                                 help='The user\'s password')
 
 role_parser = reqparse.RequestParser()
+role_parser.add_argument('user_id', dest='user_id', location='json', required=True, type=str, help='user_id')
 role_parser.add_argument('role_id', dest='role_id', location='json', required=True, type=str, help='role_id')
 
 user_signup_fields = {
@@ -51,7 +52,7 @@ user_signup_fields = {
 class UserSignUp(Resource):
     def post(self):
         args = user_info_parser.parse_args()
-        user = models.User.is_user_exist(args)
+        user = models.User.is_login_exist(args)
         if user:
             return {'message': 'choose another login'}, HTTPStatus.CONFLICT
         models.User.create(args)
@@ -70,7 +71,7 @@ class UserSignIn(Resource):
     """
     def post(self):
         args = login_pass_parser.parse_args()
-        user = models.User.check_user(args)
+        user = models.User.check_user_by_login(args)
         if user:
             models.LoginHistory.log_sign_in(user, args['fingerprint'])
         else:
@@ -116,23 +117,22 @@ class Logout(Resource):
 class ChangeUserParams(Resource):
     @jwt_required()
     def post(self):
+        # FIXME добавить проверку на уникальность логина
         args = user_params_parser.parse_args()
         user = get_current_user()
         models.User.change_user(user.id, args)
         return {'message': 'login&password successfully changed'}, HTTPStatus.OK
 
 
-class Role(Resource):
-    @jwt_required()
+class RoleManipulation(Resource):
+    @jwt_with_role_required('admin')
     def post(self):
         args = role_parser.parse_args()
-        user = get_current_user()
-        models.User.add_role(user.id, args['role_id'])
+        models.UserRole.add(args['user_id'], args['role_id'])
         return {'message': 'role added'}, HTTPStatus.OK
 
-    @jwt_required()
+    @jwt_with_role_required('admin')
     def delete(self):
         args = role_parser.parse_args()
-        user = get_current_user()
-        models.User.delete_role(user.id, args['role_id'])
+        models.UserRole.delete(args['user_id'], args['role_id'])
         return {'message': 'role deleted'}, HTTPStatus.OK
