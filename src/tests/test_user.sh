@@ -24,7 +24,6 @@ curl http://127.0.0.1:5000/api/v1/user/sign_in -XPOST -d '{"login": "*", "passwo
 echo '***'
 echo 'create role'
 curl http://127.0.0.1:5000/api/v1/access/role -XPOST -d "${ROLE}" -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}"
-#-H "Authorization: Bearer ${TOKEN}"
 echo '***'
 echo 'create role (exists)'
 curl http://127.0.0.1:5000/api/v1/access/role -XPOST -d "${ROLE}" -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}"
@@ -47,3 +46,14 @@ echo '***'
 echo 'get history'
 curl http://127.0.0.1:5000/api/v1/user/history -XGET -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}"
 echo '***'
+
+# Это нужно добавить до инициации алембика
+# create database movies_auth;
+# \c movies_auth;
+#не нужно#  create schema content;
+
+# тут инициация алембика
+
+# Это нужно будет добавить в скрипты подъёма базы
+# movies_auth=# insert into role (id, title) values ('19b7b475-81ef-47fe-9c4c-96eb440c5382', 'admin');
+# movies_auth=# insert into role (id, title) values ('5d97840d-c934-447b-84f0-9b4e4863c0f2', 'subscriber');
