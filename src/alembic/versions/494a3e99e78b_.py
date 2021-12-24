@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: adabe907e857
+Revision ID: 494a3e99e78b
 Revises: 
-Create Date: 2021-12-24 16:32:19.955244
+Create Date: 2021-12-24 21:03:30.788498
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'adabe907e857'
+revision = '494a3e99e78b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -55,7 +55,8 @@ def upgrade():
     sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user_auth.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('id')
+    sa.UniqueConstraint('id'),
+    sa.UniqueConstraint('user_id', 'role_id', name='unique_user_role')
     )
     # ### end Alembic commands ###
 
