@@ -1,7 +1,7 @@
 from functools import wraps
 from http import HTTPStatus
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response
 from flask_jwt_extended import JWTManager, get_jwt, verify_jwt_in_request
 
 app = Flask(__name__)
@@ -35,6 +35,46 @@ def check_if_token_is_revoked(jwt_header, jwt_payload) -> bool:
     return token_in_redis is None
 
 
+@jwt.expired_token_loader
+def expired_token_callback():
+    """
+    Callback на случай запроса с истёкшим токеном. Возвращаeт ответ который уйдёт пользователю.
+
+    :param _jwt_header:
+    :param jwt_data:
+    :return:
+    """
+    return make_response(jsonify({"message": "The token has expired."}), HTTPStatus.UNAUTHORIZED)
+
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return make_response(jsonify({"message": "Signature verification failed."}), HTTPStatus.UNAUTHORIZED)
+
+
+@jwt.revoked_token_loader
+def revoked_token_callback(_jwt_header, jwt_data):
+    """
+    Callback на случай запроса с отозванным токеном. Возвращаeт ответ который уйдёт пользователю.
+
+    :param _jwt_header:
+    :param jwt_data:
+    :return:
+    """
+    return make_response(jsonify({"message": "The token has been revoked."}), HTTPStatus.UNAUTHORIZED)
+
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    """
+    Callback на случай отсуствия токена. Возвращаeт ответ который уйдёт пользователю.
+
+    :param error:
+    :return:
+    """
+    return make_response(jsonify({"message": "Request does not contain an access token."}), HTTPStatus.UNAUTHORIZED)
+
+
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
@@ -55,10 +95,10 @@ def jwt_with_role_required(role: str):
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            if claims[role]:
+            if role in claims['roles']:
                 return fn(*args, **kwargs)
             else:
-                return jsonify(message="you shall not pass"), HTTPStatus.FORBIDDEN
+                return make_response(jsonify(message="you shall not pass"), HTTPStatus.FORBIDDEN)
 
         return decorator
 
