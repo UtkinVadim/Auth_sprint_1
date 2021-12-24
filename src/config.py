@@ -21,6 +21,7 @@ SQLALCHEMY_ENGINE_OPTIONS = {
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 5)))
 JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=int(os.getenv("JWT_REFRESH_TOKEN_EXPIRES", 15)))
+PROPAGATE_EXCEPTIONS = True
 
 SALT = os.getenv("SALT")
 
