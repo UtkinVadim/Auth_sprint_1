@@ -10,7 +10,7 @@ from config import SALT
 
 
 class User(db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'user_auth'
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4, unique=True, nullable=False)
     login = db.Column(db.String, unique=True, nullable=False)
@@ -19,7 +19,7 @@ class User(db.Model):
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    roles = db.relationship("Role", secondary="user_role", backref=db.backref("user", lazy="dynamic"))
+    roles = db.relationship("Role", secondary="user_role", backref=db.backref("user_auth", lazy="dynamic"))
     is_active = db.Column(BOOLEAN, default=True)
 
     @classmethod
@@ -73,6 +73,14 @@ class User(db.Model):
         user.password = cls.password_hasher(password, SALT)
         user.login = login
         db.session.commit()
+
+
+    @classmethod
+    def get_user_roles(cls, user_id: str):
+        user = User.query.filter_by(id=user_id).one_or_none()
+        roles = user.roles#.all()
+        print(roles)
+
 
 
 

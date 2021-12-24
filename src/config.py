@@ -13,6 +13,10 @@ POSTGRES_PORT = os.getenv("POSTGRES_PORT")
 
 SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 SQLALCHEMY_TRACK_MODIFICATIONS = bool(os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False))
+schema_name = 'public'
+SQLALCHEMY_ENGINE_OPTIONS = {
+            "connect_args": {'options': f'-csearch_path={schema_name}'}
+        }
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 5)))
