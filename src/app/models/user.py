@@ -32,14 +32,14 @@ class User(db.Model):
         """
         user = User(**user_fields)
         user.password = cls.password_hasher(user_fields['password'], SALT)
-        if cls.is_user_exist(user_fields):
+        if cls.is_login_exist(user_fields):
             return
         db.session.add(user)
         db.session.commit()
         return user
 
     @classmethod
-    def check_user(cls, user_fields: dict) -> Optional[db.Model]:
+    def check_user_by_login(cls, user_fields: dict) -> Optional[db.Model]:
         """
         Идентификация и аутентификация пользователя по логину-паролю
 
@@ -84,7 +84,7 @@ class User(db.Model):
         return roles_dict
 
     @classmethod
-    def is_user_exist(cls, user_fields: dict) -> bool:
+    def is_login_exist(cls, user_fields: dict) -> bool:
         """
         Проверка на существование пользователя по логину
 
@@ -116,9 +116,5 @@ class User(db.Model):
                                                    iterations).hex()
         return password_salted_hash
 
-    @classmethod
-    def add_role(cls, user_id, role_id):
-        user = User.query.filter_by(id=user_id).one_or_none()
-        user.user_role.role_id = role_id
-        db.session.commit()
+
 
