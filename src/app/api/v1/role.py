@@ -20,7 +20,6 @@ role_editor_parser.add_argument('new_title', dest='new_title', type=str, locatio
 
 
 class Role(Resource):
-    # FIXME возвращаемые значения возможно стоит вынести в отдельный пакет
     @jwt_with_role_required('admin')
     def post(self):
         args = role_parser.parse_args()
