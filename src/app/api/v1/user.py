@@ -85,6 +85,10 @@ class UserSignIn(Resource):
 
 
 class UserHistory(Resource):
+    """
+    Класс для ручки со списком логонов (успешных сеансов аутентификации) пользователя.
+
+    """
     @jwt_required()
     def get(self):
         user = get_current_user()
@@ -93,6 +97,15 @@ class UserHistory(Resource):
 
 
 class RefreshToken(Resource):
+    """
+    Класс для ручки обновления refresh токена
+    - из токена берутся identity (id пользователя) и old_jti (id текущего refresh токена)
+    - из in-memory базы удаляется из белого списка refresh токен
+    - по identity собираются актуальные роли пользователя
+    - формируется access токен, куда также кладутся роли пользователя и refresh токен
+    - refresh токен кладётся в in-momory базу
+    - пользователю возвращается пара access и refresh токенов
+    """
     @jwt_required(refresh=True)
     def get(self):
         identity = get_jwt_identity()
@@ -107,7 +120,12 @@ class RefreshToken(Resource):
 
 
 class Logout(Resource):
-    @jwt_required()
+    """
+    Ручка для логаута пользователя.
+    - из refresh токена берётся его id
+    - и удаляется из белого списка хранящегося в in-memoru базе
+    """
+    @jwt_required(refresh=True)
     def post(self):
         jti = get_jwt()["jti"]
         jwt_whitelist.delete(jti)
@@ -115,16 +133,24 @@ class Logout(Resource):
 
 
 class ChangeUserParams(Resource):
+    """
+    Класс ручки для изменения параметров пользователя (логин+пароль)
+    """
     @jwt_required()
     def post(self):
-        # FIXME добавить проверку на уникальность логина
         args = user_params_parser.parse_args()
         user = get_current_user()
+        if models.User.is_login_exist(args):
+            return {'message': 'choose another login'}, HTTPStatus.CONFLICT
         models.User.change_user(user.id, args)
         return {'message': 'login&password successfully changed'}, HTTPStatus.OK
 
 
 class RoleManipulation(Resource):
+    """
+    Класс ручки для добавления или удаления роли пользователю
+
+    """
     @jwt_with_role_required('admin')
     def post(self):
         args = role_parser.parse_args()
