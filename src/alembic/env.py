@@ -67,13 +67,26 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
+        """
+        Configure migration context
+        1. Pass our models metadata
+        2. Set schema for alembic_version table
+        3. Load all available schemas
+        """
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            version_table_schema=target_metadata.schema,
+            include_schemas=True
         )
 
         with context.begin_transaction():
+            """
+            By default search_path is setted to "$user",public 
+            that why alembic can't create foreign keys correctly
+            """
+            context.execute('SET search_path TO public')
             context.run_migrations()
-
 
 if context.is_offline_mode():
     run_migrations_offline()
