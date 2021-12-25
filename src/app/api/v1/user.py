@@ -7,7 +7,9 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt, get_jti, get_current_user
 from flask_restful import fields, reqparse, Resource
 
-from app import models, jwt_whitelist, jwt_with_role_required
+from app import models, redis_client
+from app.jwt import jwt_with_role_required
+from app.redis import Redis
 from config import JWT_REFRESH_TOKEN_EXPIRES
 
 logger = logging.getLogger(__name__)
@@ -60,6 +62,7 @@ class UserSignUp(Resource):
 
 
 class UserSignIn(Resource):
+    redis_instance = Redis()
     """
     Класс для ручки логина пользователя.
     - параметры пользователя (логин, пароль...) находятся в args
@@ -79,8 +82,7 @@ class UserSignIn(Resource):
         user_roles_dict = models.User.get_user_roles(user_id=user.id)
         access_token = create_access_token(identity=user.id, additional_claims=user_roles_dict)
         refresh_token = create_refresh_token(identity=user.id)
-        jti = get_jti(refresh_token)
-        jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
+        self.redis_instance.set_user_access_token(user_id=str(user.id), access_token=access_token)
         return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)
 
 
@@ -97,6 +99,7 @@ class UserHistory(Resource):
 
 
 class RefreshToken(Resource):
+    redis_instance = Redis()
     """
     Класс для ручки обновления refresh токена
     - из токена берутся identity (id пользователя) и old_jti (id текущего refresh токена)
@@ -108,14 +111,12 @@ class RefreshToken(Resource):
     """
     @jwt_required(refresh=True)
     def get(self):
-        identity = get_jwt_identity()
-        old_jti = get_jwt()['jti']
-        jwt_whitelist.delete(old_jti)
-        user_roles_dict = models.User.get_user_roles(user_id=identity)
-        access_token = create_access_token(identity=identity, additional_claims=user_roles_dict)
-        refresh_token = create_refresh_token(identity=identity)
-        jti = get_jti(refresh_token)
-        jwt_whitelist.set(jti, jti, ex=JWT_REFRESH_TOKEN_EXPIRES)
+        user_id = get_jwt_identity()
+        old_jwt = get_jwt()
+        user_roles_dict = models.User.get_user_roles(user_id=user_id)
+        access_token = create_access_token(identity=user_id, additional_claims=user_roles_dict)
+        refresh_token = create_refresh_token(identity=user_id)
+        self.redis_instance.refresh_user_token(str(user_id), old_jwt, access_token)
         return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)
 
 
@@ -128,7 +129,7 @@ class Logout(Resource):
     @jwt_required(refresh=True)
     def post(self):
         jti = get_jwt()["jti"]
-        jwt_whitelist.delete(jti)
+        redis_client.delete(jti)
         return jsonify(message="Refresh token revoked")
 
 

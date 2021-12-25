@@ -1,10 +1,10 @@
 import logging
 
-from flask_jwt_extended import jwt_required
 from flask_restful import reqparse, Resource
 from http import HTTPStatus
 
-from app import models, jwt_with_role_required
+from app import models
+from app.jwt import jwt_with_role_required
 
 logger = logging.getLogger(__name__)
 
