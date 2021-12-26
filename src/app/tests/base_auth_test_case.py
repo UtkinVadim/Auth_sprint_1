@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from flask_testing import TestCase
 
 from app import create_app, db, redis_client
-from app.models import User
+from app.models import User, Role, UserRole
 from app.tests.testing_data import USER_DATA
 from config import (
     TEST_DB_USER,
@@ -47,7 +49,18 @@ class BaseAuthTestCase(TestCase):
     def authorize_client(self):
         self.client.post(self.sign_up_url, json=USER_DATA)
         self.user = User.query.filter_by(login=USER_DATA.get("login")).first()
+        self.role = Role.create(title="admin")
+        UserRole.add(self.user.id, self.role.id)
         response = self.client.post(self.sign_in_url, json=USER_DATA)
         self.access_token = response.json["access_token"]
         self.refresh_token = response.json["refresh_token"]
         self.headers = {"Authorization": f"Bearer {self.access_token}"}
+
+    def create_new_user(self, login: str = None, password: str = None, email: str = None) -> User:
+        login = login if login else f"user_{datetime.now().timestamp()}"
+        password = password if password else login
+        email = email if email else f"{login}@{login}.com"
+        user_data = {"login": login, "password": password, "email": email}
+        self.client.post(self.sign_up_url, json=user_data)
+        return User.query.filter_by(login=login).first()
+

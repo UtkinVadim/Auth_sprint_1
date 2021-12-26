@@ -9,4 +9,4 @@ class RefreshTokenTestCase(BaseAuthTestCase):
     def test_refresh_access_token(self):
         headers = {"Authorization": f"Bearer {self.refresh_token}"}
         response = self.client.get(self.refresh_token_url, headers=headers)
-        print(response.json)
+        # TODO: {'message': 'The token has been revoked.'}

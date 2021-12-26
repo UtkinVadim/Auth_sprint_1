@@ -40,7 +40,7 @@ class Role(db.Model):
         return False
 
     @classmethod
-    def create(cls, role_fields) -> db.Model:
+    def create(cls, **role_fields) -> db.Model:
         """
         Создаёт новую роль
 

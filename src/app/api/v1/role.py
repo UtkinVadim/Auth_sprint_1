@@ -25,7 +25,7 @@ class Role(Resource):
         args = role_parser.parse_args()
         if models.Role.is_role_exist(args):
             return {'message': 'role already exists'}, HTTPStatus.CONFLICT
-        models.Role.create(args)
+        models.Role.create(**args)
         return {'message': 'role created'}, HTTPStatus.CREATED
 
     @jwt_with_role_required('admin')
