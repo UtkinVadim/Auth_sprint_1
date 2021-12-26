@@ -24,7 +24,6 @@ class BaseAuthTestCase(TestCase):
     sign_up_url = "/api/v1/user/sign_up"
     sign_in_url = "/api/v1/user/sign_in"
     history_url = "/api/v1/user/history"
-    refresh_token_url = "/api/v1/user/refresh"
 
     def create_app(self):
         test_config = {"SQLALCHEMY_DATABASE_URI": self.SQLALCHEMY_DATABASE_URI,
@@ -55,6 +54,7 @@ class BaseAuthTestCase(TestCase):
         self.access_token = response.json["access_token"]
         self.refresh_token = response.json["refresh_token"]
         self.headers = {"Authorization": f"Bearer {self.access_token}"}
+        self.headers_refresh = {"Authorization": f"Bearer {self.refresh_token}"}
 
     def create_new_user(self, login: str = None, password: str = None, email: str = None) -> User:
         login = login if login else f"user_{datetime.now().timestamp()}"
@@ -63,4 +63,3 @@ class BaseAuthTestCase(TestCase):
         user_data = {"login": login, "password": password, "email": email}
         self.client.post(self.sign_up_url, json=user_data)
         return User.query.filter_by(login=login).first()
-

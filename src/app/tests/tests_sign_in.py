@@ -30,8 +30,8 @@ class SignInTestCase(BaseAuthTestCase):
         response = self.client.post(self.sign_in_url, json=USER_DATA)
         assert response.status_code == HTTPStatus.OK
         user = User.query.filter_by(login=USER_DATA.get("login")).first()
-        access_token = response.json["access_token"]
-        jti = get_jti(access_token)
+        refresh_token = response.json["refresh_token"]
+        jti = get_jti(refresh_token)
         redis_key = f"{user.id}::{jti}"
         result = self.redis_client.get(redis_key)
-        assert result == access_token
+        assert result == refresh_token

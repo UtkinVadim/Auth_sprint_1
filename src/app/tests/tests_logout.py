@@ -11,5 +11,7 @@ class LogOutTestCase(BaseAuthTestCase):
         self.authorize_client()
 
     def test_logout(self):
-        response = self.client.post(self.logout_url, headers=self.headers)
-        print(response.json)
+        response = self.client.post(self.logout_url, headers=self.headers_refresh)
+        assert response.status_code == HTTPStatus.OK
+        expected_response = {'message': 'Refresh token revoked'}
+        assert response.json == expected_response

@@ -37,5 +37,5 @@ class SignIn(Resource):
         user_roles_dict = models.User.get_user_roles(user_id=user.id)
         access_token = create_access_token(identity=user.id, additional_claims=user_roles_dict)
         refresh_token = create_refresh_token(identity=user.id)
-        self.redis_instance.set_user_access_token(user_id=str(user.id), access_token=access_token)
+        self.redis_instance.set_user_refresh_token(user_id=str(user.id), refresh_token=refresh_token)
         return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)

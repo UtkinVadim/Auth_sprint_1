@@ -4,7 +4,8 @@ from http import HTTPStatus
 from flask import jsonify, make_response
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 
-from app import redis_client, jwt, models
+from app import jwt, models
+from app.redis import Redis
 
 
 @jwt.token_in_blocklist_loader
@@ -18,9 +19,8 @@ def check_if_token_is_revoked(jwt_header, jwt_payload) -> bool:
     """
     if jwt_payload["type"] != 'refresh':
         return False
-    jti = jwt_payload["jti"]
-    token_in_redis = redis_client.get(jti)
-    return token_in_redis is None
+    token_is_revoked = Redis().token_is_revoked(user_id=jwt_payload["sub"], jti=jwt_payload["jti"])
+    return token_is_revoked
 
 
 @jwt.expired_token_loader
