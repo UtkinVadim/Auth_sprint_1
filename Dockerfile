@@ -1,12 +1,12 @@
 FROM python:3.9.7-slim
-WORKDIR /functional
+WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-COPY requirements.txt .
+COPY requirements/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY src .
 
 ARG USER=auth_api_user
 RUN addgroup --system ${USER} && \
@@ -14,6 +14,5 @@ RUN addgroup --system ${USER} && \
     chown -R ${USER}:${USER} /app
 USER $USER
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
-ENTRYPOINT ["/bin/sh", "-c", "wait_for_postgres.sh"]
-CMD [""]
+#ENTRYPOINT ["./scripts/wait_for_elastic.sh"]
+CMD ["python", "run.py", "-d"]

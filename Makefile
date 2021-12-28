@@ -22,3 +22,11 @@ run:
 
 run_debug:
 	cd src && python run.py -d
+
+init_app:
+	docker-compose up --build -d postgres_auth
+	docker-compose up --build -d redis_auth
+
+run_app:
+	docker-compose up --build -d auth_api
+	docker-compose exec -it auth_api alembic upgrade head
