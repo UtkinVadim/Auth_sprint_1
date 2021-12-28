@@ -10,7 +10,7 @@ class SignUpTestCase(BaseAuthTestCase):
     def test_create_user(self):
         response = self.client.post(self.sign_up_url, json=USER_DATA)
         assert response.status_code == HTTPStatus.OK
-        assert response.json == {'message': 'user created successfully'}
+        assert response.json == {"message": "user created successfully"}
 
         created_user: User = User.query.filter_by(login=USER_DATA.get("login")).first()
 

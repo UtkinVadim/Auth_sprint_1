@@ -4,13 +4,15 @@ monkey.patch_all()
 
 import sys
 
-from app import create_app
-from config import SERVER_HOST, SERVER_PORT
 from gevent.pywsgi import WSGIServer
 
-app = create_app()
+from app import create_app, jwt
+from config import SERVER_HOST, SERVER_PORT
 
-if __name__ == '__main__':
+app = create_app()
+jwt.init_app(app)
+
+if __name__ == "__main__":
     if "-d" in sys.argv:
         app.run(debug=True)
     else:

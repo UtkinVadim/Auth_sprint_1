@@ -17,7 +17,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload) -> bool:
     :param jwt_payload:
     :return:
     """
-    if jwt_payload["type"] != 'refresh':
+    if jwt_payload["type"] != "refresh":
         return False
     token_is_revoked = Redis().token_is_revoked(user_id=jwt_payload["sub"], jti=jwt_payload["jti"])
     return token_is_revoked
@@ -96,7 +96,7 @@ def jwt_with_role_required(role: str):
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            if role in claims['roles']:
+            if role in claims["roles"]:
                 return fn(*args, **kwargs)
             else:
                 return make_response(jsonify(message="you shall not pass"), HTTPStatus.FORBIDDEN)

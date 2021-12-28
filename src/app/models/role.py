@@ -1,5 +1,5 @@
+from typing import Dict, List
 from uuid import uuid4
-from typing import List, Dict
 
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -7,12 +7,12 @@ from app import db
 
 
 class Role(db.Model):
-    __tablename__ = 'role'
+    __tablename__ = "role"
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4, unique=True, nullable=False)
     title = db.Column(db.String(255), unique=True, nullable=False)
 
     def __repr__(self):
-        return f'id: {self.id}, title: {self.title}'
+        return f"id: {self.id}, title: {self.title}"
 
     @classmethod
     def get_all(cls) -> List[Dict[str, str]]:
@@ -22,7 +22,7 @@ class Role(db.Model):
         :return:
         """
         roles = cls.query.all()
-        roles_dict = [{'id': str(role.id), 'title': str(role.title)} for role in roles]
+        roles_dict = [{"id": str(role.id), "title": str(role.title)} for role in roles]
         return roles_dict
 
     @classmethod
@@ -33,7 +33,7 @@ class Role(db.Model):
         :param role_fields:
         :return:
         """
-        title = role_fields['title']
+        title = role_fields["title"]
         role = Role.query.filter_by(title=title).one_or_none()
         if role:
             return True
@@ -71,7 +71,7 @@ class Role(db.Model):
         :param role_fields:
         :return:
         """
-        current_title = role_fields['title']
+        current_title = role_fields["title"]
         role = Role.query.filter_by(title=current_title).one_or_none()
-        role.title = role_fields['new_title']
+        role.title = role_fields["new_title"]
         db.session.commit()

@@ -1,16 +1,16 @@
-import hashlib
 import datetime
-from typing import Optional, Dict
+import hashlib
+from typing import Dict, Optional
 from uuid import uuid4
 
-from sqlalchemy.dialects.postgresql import UUID, BOOLEAN
+from sqlalchemy.dialects.postgresql import BOOLEAN, UUID
 
 from app import db
 from config import SALT
 
 
 class User(db.Model):
-    __tablename__ = 'user_auth'
+    __tablename__ = "user_auth"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4, unique=True, nullable=False)
     login = db.Column(db.String, unique=True, nullable=False)
@@ -31,7 +31,7 @@ class User(db.Model):
         :return:
         """
         user = User(**user_fields)
-        user.password = cls.password_hasher(user_fields['password'], SALT)
+        user.password = cls.password_hasher(user_fields["password"], SALT)
         if cls.is_login_exist(user_fields):
             return
         db.session.add(user)
@@ -46,8 +46,8 @@ class User(db.Model):
         :param user_fields:
         :return:
         """
-        login = user_fields['login']
-        password = user_fields['password']
+        login = user_fields["login"]
+        password = user_fields["password"]
         user = User.query.filter_by(login=login).one_or_none()
         if user:
             if user.password == cls.password_hasher(password, SALT):
@@ -56,7 +56,7 @@ class User(db.Model):
         return
 
     def __repr__(self):
-        return f'<User {self.login} {self.id}>'
+        return f"<User {self.login} {self.id}>"
 
     @classmethod
     def change_user(cls, user_id: str, user_fields: dict):
@@ -67,13 +67,12 @@ class User(db.Model):
         :param user_fields:
         :return:
         """
-        login = user_fields['new_login']
-        password = user_fields['new_password']
+        login = user_fields["new_login"]
+        password = user_fields["new_password"]
         user = User.query.filter_by(id=user_id).one_or_none()
         user.password = cls.password_hasher(password, SALT)
         user.login = login
         db.session.commit()
-
 
     @classmethod
     def get_user_roles(cls, user_id: str) -> Dict:
@@ -86,7 +85,7 @@ class User(db.Model):
         user = User.query.filter_by(id=user_id).one_or_none()
         roles = user.roles
         roles_list = [role.title for role in roles]
-        roles_dict = {'roles': roles_list}
+        roles_dict = {"roles": roles_list}
         return roles_dict
 
     @classmethod
@@ -97,15 +96,16 @@ class User(db.Model):
         :param user_fields:
         :return:
         """
-        login = user_fields['login']
+        login = user_fields["login"]
         user = User.query.filter_by(login=login).one_or_none()
         if user:
             return True
         return False
 
     @classmethod
-    def password_hasher(cls, password: str, salt: str, hash_name: str = 'sha256', iterations: int = 100000,
-                        encoding: str = 'utf-8') -> str:
+    def password_hasher(
+        cls, password: str, salt: str, hash_name: str = "sha256", iterations: int = 100000, encoding: str = "utf-8"
+    ) -> str:
         """
         Создаёт хэш от пароля который будет храниться в базе
         дока: https://docs.python.org/3.9/library/hashlib.html#hashlib.pbkdf2_hmac
@@ -118,9 +118,7 @@ class User(db.Model):
         :return:
         """
 
-        password_salted_hash = hashlib.pbkdf2_hmac(hash_name, password.encode(encoding), salt.encode(encoding),
-                                                   iterations).hex()
+        password_salted_hash = hashlib.pbkdf2_hmac(
+            hash_name, password.encode(encoding), salt.encode(encoding), iterations
+        ).hex()
         return password_salted_hash
-
-
-

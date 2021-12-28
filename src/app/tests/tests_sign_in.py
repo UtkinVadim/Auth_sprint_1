@@ -3,8 +3,8 @@ from http import HTTPStatus
 from flask_jwt_extended import get_jti
 
 from app.models import User
-from app.tests.testing_data import USER_DATA
 from app.tests.base_auth_test_case import BaseAuthTestCase
+from app.tests.testing_data import USER_DATA
 
 
 class SignInTestCase(BaseAuthTestCase):
@@ -22,7 +22,7 @@ class SignInTestCase(BaseAuthTestCase):
         data = {"login": "fake_login", "password": "fake_password"}
         response = self.client.post(self.sign_in_url, json=data)
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        expected_details = {'message': 'invalid credentials'}
+        expected_details = {"message": "invalid credentials"}
         assert response.json == expected_details
 
     def test_check_token_in_redis(self):
@@ -33,5 +33,5 @@ class SignInTestCase(BaseAuthTestCase):
         refresh_token = response.json["refresh_token"]
         jti = get_jti(refresh_token)
         redis_key = f"{user.id}::{jti}"
-        result = self.redis_client.get(redis_key)
+        result = self.get_token_from_redis(redis_key)
         assert result == refresh_token

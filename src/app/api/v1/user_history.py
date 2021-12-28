@@ -1,8 +1,7 @@
 from http import HTTPStatus
 
-from flask import jsonify
-from flask import make_response
-from flask_jwt_extended import jwt_required, get_current_user
+from flask import jsonify, make_response
+from flask_jwt_extended import get_current_user, jwt_required
 from flask_restful import Resource
 
 from app import models
