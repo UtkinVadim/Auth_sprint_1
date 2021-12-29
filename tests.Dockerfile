@@ -3,8 +3,9 @@ WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-COPY requirements/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements .
+RUN pip install --no-cache-dir -r dev.txt
+RUN apt update && apt install netcat -y
 
 COPY src .
 
@@ -15,5 +16,7 @@ RUN addgroup --system ${USER} && \
 USER $USER
 
 RUN chmod +x scripts/wait_for_dbs.sh
+
+
 ENTRYPOINT ["./scripts/wait_for_dbs.sh"]
-CMD ["python", "run.py"]
+CMD ["pytest", "./app"]
