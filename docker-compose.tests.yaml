@@ -21,6 +21,7 @@ services:
 
   auth_api_tests:
     build:
+      context: .
       dockerfile: tests.Dockerfile
     container_name: auth_api_tests
     env_file:
@@ -43,3 +44,6 @@ services:
 networks:
   auth-network-tests:
     name: auth-network-tests
+
+volumes:
+  testing_postgres_auth:

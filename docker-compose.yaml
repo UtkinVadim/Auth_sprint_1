@@ -24,6 +24,7 @@ services:
 
   auth_api:
     build:
+      context: .
       dockerfile: Dockerfile
     container_name: auth_api
     ports:
