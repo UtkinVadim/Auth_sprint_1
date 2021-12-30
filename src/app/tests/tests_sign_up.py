@@ -8,6 +8,10 @@ from config import SALT
 
 class SignUpTestCase(BaseAuthTestCase):
     def test_create_user(self):
+        """
+        В тесте делается запрос на создание нового пользователя.
+        Проверяется, что пользователь успешно создан и записан в бд.
+        """
         response = self.client.post(self.sign_up_url, json=USER_DATA)
         assert response.status_code == HTTPStatus.OK
         assert response.json == {"message": "user created successfully"}

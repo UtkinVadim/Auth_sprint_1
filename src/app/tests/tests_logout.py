@@ -11,6 +11,10 @@ class LogOutTestCase(BaseAuthTestCase):
         self.authorize_client()
 
     def test_logout(self):
+        """
+        Тест на логаут.
+        Проверяется, что логаут совершается без ошибок, и после него токен удаляется из redis.
+        """
         token_in_redis = self.get_token_from_redis()
         assert token_in_redis
         response = self.client.post(self.url, headers=self.headers_refresh)
@@ -21,6 +25,10 @@ class LogOutTestCase(BaseAuthTestCase):
         assert not token_in_redis
 
     def test_logout_from_all_places(self):
+        """
+        Тест на логаут со всех устройств.
+        Проверяется, что логаут совершается без ошибок, и после него токен удаляется из redis.
+        """
         token_in_redis = self.get_token_from_redis()
         assert token_in_redis
         data = {"form_all_places": True}

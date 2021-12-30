@@ -10,7 +10,12 @@ class RefreshTokenTestCase(BaseAuthTestCase):
         super().setUp()
         self.authorize_client()
 
-    def test_refresh_access_token(self):
+    def test_refresh_token(self):
+        """
+        Тест на обновление токена.
+        В тесте делается запрос к апи на обновление токенов.
+        Проверяется, что новые токены отличаются от старых после рефреша.
+        """
         old_access_token = self.access_token
         old_refresh_token = self.refresh_token
         response = self.client.get(self.url, headers=self.headers_refresh)

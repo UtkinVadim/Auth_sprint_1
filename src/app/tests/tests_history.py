@@ -11,6 +11,10 @@ class HistoryTestCase(BaseAuthTestCase):
         self.authorize_client()
 
     def test_get_history(self):
+        """
+        В тесте проверяется получение истории входов пользователя в аккаунт.
+        Т.к. пользователь входил 1 раз при self.authorize_client(), история должна содержать 1 запись.
+        """
         response = self.client.get(self.url, headers=self.headers)
         assert response.status_code == HTTPStatus.OK
         events = response.json["events"]

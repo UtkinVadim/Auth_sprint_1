@@ -13,12 +13,20 @@ class SignInTestCase(BaseAuthTestCase):
         self.client.post("/api/v1/user/sign_up", json=USER_DATA)
 
     def test_user_sign_in(self):
+        """
+        В тесте делается запрос на вход в сервис с логином и паролем.
+        Проверяется, что запрос прошел успешно, и вернулись токены.
+        """
         response = self.client.post(self.sign_in_url, json=USER_DATA)
         assert response.status_code == HTTPStatus.OK
         assert "access_token" in response.json
         assert "refresh_token" in response.json
 
     def test_wrong_sign_in_data(self):
+        """
+        В тесте делается запрос на вход в сервис с логином и неверным паролем.
+        Проверяется, что запрос возвращает ошибку.
+        """
         data = {"login": "fake_login", "password": "fake_password"}
         response = self.client.post(self.sign_in_url, json=data)
         assert response.status_code == HTTPStatus.UNAUTHORIZED
@@ -26,6 +34,9 @@ class SignInTestCase(BaseAuthTestCase):
         assert response.json == expected_details
 
     def test_check_token_in_redis(self):
+        """
+        В тесте проверяется сохранение токена пользователя в redis после входа.
+        """
         self.clear_redis_cache()
         response = self.client.post(self.sign_in_url, json=USER_DATA)
         assert response.status_code == HTTPStatus.OK

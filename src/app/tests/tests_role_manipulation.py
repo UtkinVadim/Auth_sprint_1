@@ -12,6 +12,10 @@ class RoleManipulationTestCase(BaseAuthTestCase):
         self.authorize_client()
 
     def test_add_role(self):
+        """
+        В тесте делается запрос на добавление пользователю роли.
+        Проверяется, что после запроса роль появилась у пользователя.
+        """
         new_user = self.create_new_user()
         role = Role.create(title="you_awesome")
         data = {"user_id": new_user.id, "role_id": role.id}
@@ -22,6 +26,10 @@ class RoleManipulationTestCase(BaseAuthTestCase):
         assert role in new_user.roles
 
     def test_remove_role(self):
+        """
+        В тесте делается запрос на удаление роли пользователя.
+        Проверяется, что после запроса роль удалилась у пользователя.
+        """
         new_user = self.create_new_user()
         role = Role.create(title="you_awesome")
         UserRole.add(new_user.id, role.id)
