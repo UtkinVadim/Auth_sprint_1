@@ -8,11 +8,11 @@ from app import db
 
 
 class UserRole(db.Model):
-    __tablename__ = 'user_role'
-    __table_args__ = (UniqueConstraint('user_id', 'role_id', name='unique_user_role'),)
+    __tablename__ = "user_role"
+    __table_args__ = (UniqueConstraint("user_id", "role_id", name="unique_user_role"),)
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4, unique=True, nullable=False)
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('user_auth.id'), nullable=False)
-    role_id = db.Column(UUID(as_uuid=True), db.ForeignKey('role.id'), nullable=False)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("user_auth.id"), nullable=False)
+    role_id = db.Column(UUID(as_uuid=True), db.ForeignKey("role.id"), nullable=False)
     created_at = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 
     @classmethod

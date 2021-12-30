@@ -1,16 +1,21 @@
+from flask_alembic import Alembic
 from gevent import monkey
 
 monkey.patch_all()
 
 import sys
 
-from app import app
-from config import SERVER_HOST, SERVER_PORT
 from gevent.pywsgi import WSGIServer
 
-if __name__ == '__main__':
+from app import create_app, jwt
+from config import SERVER_HOST, SERVER_PORT
+
+app = create_app()
+jwt.init_app(app)
+
+if __name__ == "__main__":
     if "-d" in sys.argv:
-        app.run(debug=True)
+        app.run(host="0.0.0.0", port=SERVER_PORT, debug=True)
     else:
         http_server = WSGIServer((SERVER_HOST, SERVER_PORT), app)
         http_server.serve_forever()

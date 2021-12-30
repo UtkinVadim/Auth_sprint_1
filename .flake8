@@ -11,6 +11,10 @@ exclude =
     .*
     venv
     env
+    alembic
+    run_tests.py
+    __init__.py
+    run.py
 
 max-cognitive-complexity = 10
 
