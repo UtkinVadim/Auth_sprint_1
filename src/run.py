@@ -1,5 +1,6 @@
-from flask_alembic import Alembic
 from gevent import monkey
+
+from create_admin import create_admin
 
 monkey.patch_all()
 
@@ -14,6 +15,7 @@ app = create_app()
 jwt.init_app(app)
 
 if __name__ == "__main__":
+    create_admin(app)
     if "-d" in sys.argv:
         app.run(host="0.0.0.0", port=SERVER_PORT, debug=True)
     else:
