@@ -15,4 +15,6 @@ RUN addgroup --system ${USER} && \
     chown -R ${USER}:${USER} /app
 USER $USER
 
+RUN chmod +x scripts/wait_for_dbs.sh
+ENTRYPOINT ["./scripts/wait_for_dbs.sh"]
 CMD ["python", "run.py"]

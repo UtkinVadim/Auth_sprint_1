@@ -44,6 +44,3 @@ services:
 networks:
   auth-network-tests:
     name: auth-network-tests
-
-volumes:
-  testing_postgres_auth:
