@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Dict, List
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -29,7 +28,7 @@ class LoginHistory(db.Model):
         db.session.commit()
 
     @classmethod
-    def get_user_events(cls, user_id) -> List[Dict[str, str]]:
+    def get_user_events(cls, user_id) -> list[dict[str, str]]:
         """
         Возвращает список успешных логонов пользователя
 

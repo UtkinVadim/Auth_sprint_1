@@ -1,12 +1,14 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from flask_redis import FlaskRedis
+from app.redis_db import RedisConnector
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
 
+import config
+
 db = SQLAlchemy()
-redis_client = FlaskRedis(decode_responses=True)
+redis_client = RedisConnector(config.REDIS_HOST, config.REDIS_PORT)
 jwt = JWTManager()
 swagger = Swagger(template_file='auth_api_schema.yaml')
 
@@ -27,12 +29,10 @@ def create_app(test_config: dict = None) -> Flask:
 
     db.init_app(app)
 
-    redis_client.init_app(app)
-
     api = Api(app)
     from app.api.v1.urls import urls
 
-    for api_url in urls:
-        api.add_resource(api_url[0], api_url[1])
+    for resource, url in urls:
+        api.add_resource(resource, url)
 
     return app

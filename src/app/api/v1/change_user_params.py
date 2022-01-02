@@ -7,10 +7,10 @@ from app import models
 
 user_params_parser = reqparse.RequestParser()
 user_params_parser.add_argument(
-    "new_login", dest="new_login", location="json", required=True, type=str, help="The user's login"
+    "login", dest="login", location="json", required=False, type=str, help="The user's login"
 )
 user_params_parser.add_argument(
-    "new_password", dest="new_password", type=str, location="json", required=True, help="The user's password"
+    "password", dest="password", type=str, location="json", required=False, help="The user's password"
 )
 
 
@@ -23,7 +23,8 @@ class ChangeUserParams(Resource):
     def post(self):
         args = user_params_parser.parse_args()
         user = get_current_user()
-        if models.User.is_login_exist(args):
-            return {"message": "choose another login"}, HTTPStatus.CONFLICT
+        if "login" in args:
+            if models.User.is_login_exist(args):
+                return {"message": "choose another login"}, HTTPStatus.CONFLICT
         models.User.change_user(user.id, args)
-        return {"message": "login&password successfully changed"}, HTTPStatus.OK
+        return {"message": "successfully changed"}, HTTPStatus.OK

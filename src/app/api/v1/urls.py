@@ -8,10 +8,10 @@ from .sign_up import SignUp
 from .user_history import UserHistory
 
 urls = [
-    (SignIn, "/api/v1/user/sign_in"),
-    (SignUp, "/api/v1/user/sign_up"),
+    (SignIn, "/api/user/sign_in"),
+    (SignUp, "/api/user/sign_up"),
+    (SignOut, "/api/user/sign_out"),
     (RefreshToken, "/api/v1/user/refresh"),
-    (SignOut, "/api/v1/user/sign_out"),
     (ChangeUserParams, "/api/v1/user/change"),
     (UserHistory, "/api/v1/user/history"),
     (RoleManipulation, "/api/v1/user/role"),

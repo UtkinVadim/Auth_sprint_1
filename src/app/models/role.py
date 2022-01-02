@@ -1,4 +1,3 @@
-from typing import Dict, List
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -15,7 +14,7 @@ class Role(db.Model):
         return f"id: {self.id}, title: {self.title}"
 
     @classmethod
-    def get_all(cls) -> List[Dict[str, str]]:
+    def get_all(cls) -> list[dict[str, str]]:
         """
         Возвращает полный список ролей
 

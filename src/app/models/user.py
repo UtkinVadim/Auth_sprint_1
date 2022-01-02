@@ -1,10 +1,11 @@
 import datetime
 import hashlib
-from typing import Dict, Optional
+from typing import Optional
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import BOOLEAN, UUID
 
+import config
 from app import db
 from config import SALT
 
@@ -67,15 +68,15 @@ class User(db.Model):
         :param user_fields:
         :return:
         """
-        login = user_fields["new_login"]
-        password = user_fields["new_password"]
         user = User.query.filter_by(id=user_id).one_or_none()
-        user.password = cls.password_hasher(password, SALT)
-        user.login = login
+        if login := user_fields["login"]:
+            user.login = login
+        if password := user_fields["password"]:
+            user.password = cls.password_hasher(password, SALT)
         db.session.commit()
 
     @classmethod
-    def get_user_roles(cls, user_id: str) -> Dict:
+    def get_user_roles(cls, user_id: str) -> dict:
         """
         Возвращает словарь вида id пользователя -> список его ролей
 
@@ -104,7 +105,8 @@ class User(db.Model):
 
     @classmethod
     def password_hasher(
-        cls, password: str, salt: str, hash_name: str = "sha256", iterations: int = 100000, encoding: str = "utf-8"
+            cls, password: str, salt: Optional[str] = None, hash_name: str = "sha256", iterations: int = 100000,
+            encoding: str = "utf-8"
     ) -> str:
         """
         Создаёт хэш от пароля который будет храниться в базе
@@ -117,7 +119,7 @@ class User(db.Model):
         :param encoding:
         :return:
         """
-
+        salt = salt or config.SALT
         password_salted_hash = hashlib.pbkdf2_hmac(
             hash_name, password.encode(encoding), salt.encode(encoding), iterations
         ).hex()

@@ -16,9 +16,10 @@ jwt.init_app(app)
 swagger.init_app(app)
 
 if __name__ == "__main__":
-    create_admin(app)
     if "-d" in sys.argv:
         app.run(host="0.0.0.0", port=SERVER_PORT, debug=True)
+    elif "--create-admin" in sys.argv:
+        create_admin(app)
     else:
         http_server = WSGIServer((SERVER_HOST, SERVER_PORT), app)
         http_server.serve_forever()

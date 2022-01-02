@@ -40,3 +40,18 @@ class UserRole(db.Model):
         user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).one_or_none()
         db.session.delete(user_role)
         db.session.commit()
+
+    @classmethod
+    def is_user_role_exists(cls, user_fields: dict) -> bool:
+        """
+        Проверка на существование пользователя по логину
+
+        :param user_fields:
+        :return:
+        """
+        user_id = user_fields["user_id"]
+        role_id = user_fields["role_id"]
+        user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).one_or_none()
+        if user_role:
+            return True
+        return False
