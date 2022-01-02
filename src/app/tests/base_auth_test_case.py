@@ -8,12 +8,11 @@ from app import create_app, db, jwt, redis_client
 from app.models import Role, User, UserRole
 from app.tests.testing_data import USER_DATA
 from config import (TEST_DB, TEST_DB_HOST, TEST_DB_PASSWORD, TEST_DB_PORT,
-                    TEST_DB_USER, TEST_REDIS_HOST, TEST_REDIS_PORT)
+                    TEST_DB_USER)
 
 
 class BaseAuthTestCase(TestCase):
     SQLALCHEMY_DATABASE_URI = f"postgresql://{TEST_DB_USER}:{TEST_DB_PASSWORD}@{TEST_DB_HOST}:{TEST_DB_PORT}/{TEST_DB}"
-    REDIS_URL = f"redis://{TEST_REDIS_HOST}:{TEST_REDIS_PORT}/0"
     TESTING = True
 
     sign_up_url = "/api/user/sign_up"
@@ -26,7 +25,6 @@ class BaseAuthTestCase(TestCase):
         test_config = {
             "SQLALCHEMY_DATABASE_URI": self.SQLALCHEMY_DATABASE_URI,
             "TESTING": True,
-            "REDIS_URL": self.REDIS_URL,
         }
         app = create_app(test_config)
         jwt.init_app(app)
@@ -34,7 +32,7 @@ class BaseAuthTestCase(TestCase):
 
     def setUp(self):
         self.db = db
-        self.redis_client = redis_client
+        self.redis_client = redis_client.db
         self.db.create_all()
 
     def tearDown(self):
@@ -46,8 +44,9 @@ class BaseAuthTestCase(TestCase):
         """
         Метод для удаления всех тестовых данных из redis.
         """
-        for key in self.redis_client.scan_iter("*"):
-            self.redis_client.delete(key)
+        #        keys = self.redis_client.keys("*")
+        if keys := self.redis_client.keys("*"):
+            self.redis_client.delete(*keys)
 
     def authorize_client(self):
         """

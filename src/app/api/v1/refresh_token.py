@@ -5,8 +5,7 @@ from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 get_jwt, get_jwt_identity, jwt_required)
 from flask_restful import Resource
 
-from app import models
-from app.redis import redis
+from app import models, redis_client
 
 
 class RefreshToken(Resource):
@@ -27,5 +26,5 @@ class RefreshToken(Resource):
         access_token = create_access_token(identity=user_id, additional_claims=user_roles_dict)
         refresh_token = create_refresh_token(identity=user_id)
         old_jwt = get_jwt()
-        redis.refresh_user_token(str(user_id), old_jwt, access_token)
+        redis_client.refresh_user_token(str(user_id), old_jwt, access_token)
         return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)

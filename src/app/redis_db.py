@@ -1,13 +1,12 @@
 from flask_jwt_extended import get_jti
-from flask_redis import FlaskRedis
+import redis
 
-from app import redis_client
 from config import JWT_REFRESH_TOKEN_EXPIRES
 
 
-class Redis:
-    def __init__(self):
-        self.redis_client: FlaskRedis = redis_client
+class RedisConnector:
+    def __init__(self, redis_host, redis_port, **kwargs):
+        self.db = redis.Redis(host=redis_host, port=redis_port, **kwargs, decode_responses=True)
 
     def set_user_refresh_token(self, user_id: str, refresh_token: str) -> None:
         """
@@ -15,7 +14,7 @@ class Redis:
         """
         jti = get_jti(refresh_token)
         key = self.generate_redis_key(user_id, jti)
-        self.redis_client.set(key, refresh_token, ex=JWT_REFRESH_TOKEN_EXPIRES)
+        self.db.set(key, refresh_token, ex=JWT_REFRESH_TOKEN_EXPIRES)
 
     def refresh_user_token(self, user_id: str, old_jwt: dict, new_jwt: str):
         """
@@ -31,22 +30,22 @@ class Redis:
         jti = refresh_token["jti"]
         user_id = refresh_token["sub"]
         key = self.generate_redis_key(user_id, jti)
-        self.redis_client.delete(key)
+        self.db.delete(key)
 
     def remove_all_user_tokens(self, refresh_token: dict) -> None:
         """
         Метод для удаления всех токенов принадлежащих пользователю.
         """
         user_id = refresh_token["sub"]
-        keys = self.redis_client.keys(f"{user_id}::*")
-        self.redis_client.delete(*keys)
+        if keys := self.db.keys(f"{user_id}::*"):
+            self.db.delete(*keys)
 
     def token_is_revoked(self, user_id: str, jti: str) -> bool:
         """
         Метод для проверки токена пользователя на наличие в redis.
         """
         key = self.generate_redis_key(user_id, jti)
-        result = self.redis_client.get(key)
+        result = self.db.get(key)
         if not result:
             return True
         return False
@@ -59,4 +58,3 @@ class Redis:
         return "::".join([user_id, jti])
 
 
-redis = Redis()

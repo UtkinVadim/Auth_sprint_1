@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from flask_redis import FlaskRedis
+from app.redis_db import RedisConnector
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 
+import config
+
 db = SQLAlchemy()
-redis_client = FlaskRedis(decode_responses=True)
+redis_client = RedisConnector(config.REDIS_HOST, config.REDIS_PORT)
 jwt = JWTManager()
 
 
@@ -24,8 +26,6 @@ def create_app(test_config: dict = None) -> Flask:
         app.config.from_mapping(test_config)
 
     db.init_app(app)
-
-    redis_client.init_app(app)
 
     api = Api(app)
     from app.api.v1.urls import urls
