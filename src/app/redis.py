@@ -38,8 +38,8 @@ class Redis:
         Метод для удаления всех токенов принадлежащих пользователю.
         """
         user_id = refresh_token["sub"]
-        for key in self.redis_client.scan_iter(f"{user_id}::*"):
-            self.redis_client.delete(key)
+        keys = self.redis_client.keys(f"{user_id}::*")
+        self.redis_client.delete(*keys)
 
     def token_is_revoked(self, user_id: str, jti: str) -> bool:
         """
@@ -57,3 +57,6 @@ class Redis:
         Метод для генерации ключа для redis.
         """
         return "::".join([user_id, jti])
+
+
+redis = Redis()
