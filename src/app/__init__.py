@@ -30,7 +30,7 @@ def create_app(test_config: dict = None) -> Flask:
     api = Api(app)
     from app.api.v1.urls import urls
 
-    for api_url in urls:
-        api.add_resource(api_url[0], api_url[1])
+    for resource, url in urls:
+        api.add_resource(resource, url)
 
     return app
