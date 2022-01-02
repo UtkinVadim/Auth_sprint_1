@@ -1,6 +1,6 @@
 import datetime
 import hashlib
-from typing import Dict, Optional
+from typing import Optional
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import BOOLEAN, UUID
@@ -75,7 +75,7 @@ class User(db.Model):
         db.session.commit()
 
     @classmethod
-    def get_user_roles(cls, user_id: str) -> Dict:
+    def get_user_roles(cls, user_id: str) -> dict:
         """
         Возвращает словарь вида id пользователя -> список его ролей
 
