@@ -8,11 +8,12 @@ import sys
 
 from gevent.pywsgi import WSGIServer
 
-from app import create_app, jwt
+from app import create_app, jwt, swagger
 from config import SERVER_HOST, SERVER_PORT
 
 app = create_app()
 jwt.init_app(app)
+swagger.init_app(app)
 
 if __name__ == "__main__":
     create_admin(app)

@@ -3,10 +3,12 @@ from flask_jwt_extended import JWTManager
 from flask_redis import FlaskRedis
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
 
 db = SQLAlchemy()
 redis_client = FlaskRedis(decode_responses=True)
 jwt = JWTManager()
+swagger = Swagger(template_file='auth_api_schema.yaml')
 
 
 def create_app(test_config: dict = None) -> Flask:
