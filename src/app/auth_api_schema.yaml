@@ -214,6 +214,10 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/ResponseRMPost'
+        '409':
+          description: ''
+          schema:
+            $ref: '#/definitions/UserAlreadyHasRole'
       tags:
         - User
     delete:
@@ -230,6 +234,10 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/ResponseRMDelete'
+        '409':
+          description: ''
+          schema:
+            $ref: '#/definitions/UserHasNoRole'
       tags:
         - User
     parameters: []
@@ -335,6 +343,22 @@ definitions:
         type: string
         default: choose another login
         minLength: 1
+  UserAlreadyHasRole:
+    type: object
+    properties:
+      message:
+        title: Message
+        type: string
+        default: user already has role
+        minLength: 1
+  UserHasNoRole:
+    type: object
+    properties:
+      message:
+        title: Message
+        type: string
+        default: user has no role
+        minLength: 1
   RoleModel:
     required:
       - id
@@ -427,13 +451,13 @@ definitions:
   RequestCUP:
     type: object
     properties:
-      new_login:
-        title: New login
+      login:
+        title: Login
         description: New user's login
         type: string
         minLength: 1
-      new_password:
-        title: New password
+      password:
+        title: Password
         description: New user's password
         type: string
         minLength: 1
