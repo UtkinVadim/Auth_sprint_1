@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_restful import Resource, reqparse
 
 from app import models
-from app.redis import Redis
+from app.redis import redis
 
 sign_in_parser = reqparse.RequestParser()
 sign_in_parser.add_argument("login", dest="login", location="json", required=True, type=str, help="The user's login")
@@ -16,7 +16,6 @@ sign_in_parser.add_argument("User-Agent", dest="fingerprint", location="headers"
 
 
 class SignIn(Resource):
-    redis_instance = Redis()
     """
     Класс для ручки логина пользователя.
     - параметры пользователя (логин, пароль...) находятся в args
@@ -37,5 +36,5 @@ class SignIn(Resource):
         user_roles_dict = models.User.get_user_roles(user_id=user.id)
         access_token = create_access_token(identity=user.id, additional_claims=user_roles_dict)
         refresh_token = create_refresh_token(identity=user.id)
-        self.redis_instance.set_user_refresh_token(user_id=str(user.id), refresh_token=refresh_token)
+        redis.set_user_refresh_token(user_id=str(user.id), refresh_token=refresh_token)
         return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), HTTPStatus.OK)

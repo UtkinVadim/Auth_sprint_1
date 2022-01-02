@@ -2,14 +2,13 @@ from flask import jsonify
 from flask_jwt_extended import get_jwt, jwt_required
 from flask_restful import Resource, reqparse
 
-from app.redis import Redis
+from app.redis import redis
 
 sign_out_parser = reqparse.RequestParser()
 sign_out_parser.add_argument("form_all_places", type=bool, location="json", required=False)
 
 
 class SignOut(Resource):
-    redis_instance = Redis()
     """
     Ручка для логаута пользователя.
     - из refresh токена берётся его id
@@ -22,7 +21,7 @@ class SignOut(Resource):
         sign_out_from_all_places = args.get("form_all_places", False)
         token = get_jwt()
         if sign_out_from_all_places:
-            self.redis_instance.remove_all_user_tokens(token)
+            redis.remove_all_user_tokens(token)
             return jsonify(message="All user tokens revoked")
-        self.redis_instance.remove_user_token(token)
+        redis.remove_user_token(token)
         return jsonify(message="Refresh token revoked")
