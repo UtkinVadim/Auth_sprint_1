@@ -1,4 +1,3 @@
-import logging
 from http import HTTPStatus
 
 from flask_restful import Resource, reqparse
@@ -6,7 +5,6 @@ from flask_restful import Resource, reqparse
 from app import models
 from app.jwt import jwt_with_role_required
 
-logger = logging.getLogger(__name__)
 
 role_parser = reqparse.RequestParser()
 role_parser.add_argument("title", dest="title", type=str, location="json", required=True, help="The role's title")
