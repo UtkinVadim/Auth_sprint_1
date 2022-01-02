@@ -10,7 +10,7 @@ from app.tests.testing_data import USER_DATA
 class SignInTestCase(BaseAuthTestCase):
     def setUp(self):
         super().setUp()
-        self.client.post("/api/v1/user/sign_up", json=USER_DATA)
+        self.client.post(self.sign_up_url, json=USER_DATA)
 
     def test_user_sign_in(self):
         """

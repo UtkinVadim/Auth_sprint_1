@@ -4,7 +4,7 @@ from app.tests.base_auth_test_case import BaseAuthTestCase
 
 
 class LogOutTestCase(BaseAuthTestCase):
-    url = "/api/v1/user/sign_out"
+    url = "/api/user/sign_out"
 
     def setUp(self):
         super().setUp()

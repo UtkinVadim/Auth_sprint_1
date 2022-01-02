@@ -16,8 +16,8 @@ class BaseAuthTestCase(TestCase):
     REDIS_URL = f"redis://{TEST_REDIS_HOST}:{TEST_REDIS_PORT}/0"
     TESTING = True
 
-    sign_up_url = "/api/v1/user/sign_up"
-    sign_in_url = "/api/v1/user/sign_in"
+    sign_up_url = "/api/user/sign_up"
+    sign_in_url = "/api/user/sign_in"
 
     def create_app(self):
         """
