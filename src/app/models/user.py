@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import BOOLEAN, UUID
 
+import config
 from app import db
 from config import SALT
 
@@ -104,7 +105,8 @@ class User(db.Model):
 
     @classmethod
     def password_hasher(
-        cls, password: str, salt: str, hash_name: str = "sha256", iterations: int = 100000, encoding: str = "utf-8"
+            cls, password: str, salt: Optional[str] = None, hash_name: str = "sha256", iterations: int = 100000,
+            encoding: str = "utf-8"
     ) -> str:
         """
         Создаёт хэш от пароля который будет храниться в базе
@@ -117,7 +119,7 @@ class User(db.Model):
         :param encoding:
         :return:
         """
-
+        salt = salt or config.SALT
         password_salted_hash = hashlib.pbkdf2_hmac(
             hash_name, password.encode(encoding), salt.encode(encoding), iterations
         ).hex()
