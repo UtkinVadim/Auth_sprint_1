@@ -1,4 +1,4 @@
-.PHONY: env dbs down init_app migrations run_local run_debug init_app run_app run_prod run_tests tests prod down_tests down_prod
+.PHONY: env dbs down init_app migrations run_local run_debug init_app run_app run_prod run_tests tests prod down_tests down_prod create_admin
 
 env:
 	cp .env.template .env
@@ -42,6 +42,10 @@ down_tests:
 
 down_prod:
 	docker compose -f docker-compose.yaml down
+
+create_admin:
+	docker exec -it auth_api python run.py --create-admin
+
 
 tests: env run_tests
 prod: env run_prod
