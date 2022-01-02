@@ -68,11 +68,11 @@ class User(db.Model):
         :param user_fields:
         :return:
         """
-        login = user_fields["new_login"]
-        password = user_fields["new_password"]
         user = User.query.filter_by(id=user_id).one_or_none()
-        user.password = cls.password_hasher(password, SALT)
-        user.login = login
+        if login := user_fields["login"]:
+            user.login = login
+        if password := user_fields["password"]:
+            user.password = cls.password_hasher(password, SALT)
         db.session.commit()
 
     @classmethod

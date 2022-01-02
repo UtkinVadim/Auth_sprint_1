@@ -17,6 +17,7 @@ class BaseAuthTestCase(TestCase):
 
     sign_up_url = "/api/user/sign_up"
     sign_in_url = "/api/user/sign_in"
+    sign_out_url = "/api/user/sign_out"
 
     def create_app(self):
         """
@@ -44,7 +45,6 @@ class BaseAuthTestCase(TestCase):
         """
         Метод для удаления всех тестовых данных из redis.
         """
-        #        keys = self.redis_client.keys("*")
         if keys := self.redis_client.keys("*"):
             self.redis_client.delete(*keys)
 
