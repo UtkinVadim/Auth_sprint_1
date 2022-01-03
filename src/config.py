@@ -30,6 +30,7 @@ SALT = os.getenv("SALT")
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = int(os.getenv("REDIS_PORT"))
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
+REDIS_DB = int(os.getenv("REDIS_DB"))
 
 SERVER_HOST = os.getenv("SERVER_HOST")
 SERVER_PORT = int(os.getenv("SERVER_PORT"))
@@ -42,6 +43,7 @@ TEST_DB_PORT = os.getenv("TEST_DB_PORT")
 
 TEST_REDIS_HOST = os.getenv("TEST_REDIS_HOST")
 TEST_REDIS_PORT = int(os.getenv("TEST_REDIS_PORT"))
+TEST_REDIS_DB = int(os.getenv("TEST_REDIS_DB"))
 
 SUPERUSER_NAME = os.getenv("SUPERUSER_NAME")
 SUPERUSER_PASSWORD = os.getenv("SUPERUSER_PASSWORD")

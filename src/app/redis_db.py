@@ -5,8 +5,8 @@ from config import JWT_REFRESH_TOKEN_EXPIRES
 
 
 class RedisConnector:
-    def __init__(self, redis_host, redis_port, **kwargs):
-        self.db = redis.Redis(host=redis_host, port=redis_port, **kwargs, decode_responses=True)
+    def __init__(self, redis_host, redis_port, redis_db=0, **kwargs):
+        self.db = redis.Redis(host=redis_host, port=redis_port, db=redis_db, **kwargs, decode_responses=True)
 
     def set_user_refresh_token(self, user_id: str, refresh_token: str) -> None:
         """

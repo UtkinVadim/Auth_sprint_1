@@ -8,7 +8,7 @@ from flasgger import Swagger
 import config
 
 db = SQLAlchemy()
-redis_client = RedisConnector(config.REDIS_HOST, config.REDIS_PORT)
+redis_client = RedisConnector(config.REDIS_HOST, config.REDIS_PORT, config.REDIS_DB)
 jwt = JWTManager()
 swagger = Swagger(template_file='auth_api_schema.yaml')
 
@@ -24,6 +24,7 @@ def create_app(test_config: dict = None) -> Flask:
 
     if test_config is None:
         app.config.from_object("config")
+        jwt.init_app(app)
     else:
         app.config.from_mapping(test_config)
 
@@ -36,6 +37,5 @@ def create_app(test_config: dict = None) -> Flask:
         api.add_resource(resource, url)
 
     swagger.init_app(app)
-    jwt.init_app(app)
 
     return app
