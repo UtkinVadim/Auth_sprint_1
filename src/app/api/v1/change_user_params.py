@@ -46,7 +46,7 @@ class ChangeUserParams(Resource):
     def check_passwords(user: models.User, args: dict) -> None:
         old_password = args.get("old_password")
         if not old_password:
-            raise ChangeUserParamsException(message="enter your old password")
+            raise ChangeUserParamsException(message="enter your old password", status_code=HTTPStatus.BAD_REQUEST)
         password_is_correct = user.check_password(old_password)
         if not password_is_correct:
-            raise ChangeUserParamsException(message="invalid password")
+            raise ChangeUserParamsException(message="invalid password", status_code=HTTPStatus.UNAUTHORIZED)

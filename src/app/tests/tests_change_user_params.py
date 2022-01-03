@@ -36,7 +36,7 @@ class SignInTestCase(BaseAuthTestCase):
         data = USER_NEW_PASSWORD.copy()
         data["old_password"] = "invalid_password"
         response = self.client.post(self.url, headers=self.headers, json=data)
-        assert response.status_code == HTTPStatus.CONFLICT
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
         expected_response = {"message": "invalid password"}
         assert response.json == expected_response
 
@@ -44,6 +44,6 @@ class SignInTestCase(BaseAuthTestCase):
         data = USER_NEW_PASSWORD.copy()
         data.pop("old_password")
         response = self.client.post(self.url, headers=self.headers, json=data)
-        assert response.status_code == HTTPStatus.CONFLICT
+        assert response.status_code == HTTPStatus.BAD_REQUEST
         expected_response = {"message": "enter your old password"}
         assert response.json == expected_response
