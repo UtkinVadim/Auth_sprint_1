@@ -17,7 +17,7 @@ class SignInTestCase(BaseAuthTestCase):
         self.headers_refresh = {"Authorization": f"Bearer {self.refresh_token}"}
 
     def test_change_login(self):
-        response = self.client.post(self.url, headers=self.headers, json=USER_NEW_LOGIN)
+        response = self.client.post(self.url, headers=self.headers, json= {"login": "AnotherMrSmith"})
         assert response.json == {"message": "successfully changed"}
         response = self.client.post(self.sign_out_url, headers=self.headers_refresh)
         assert response.json == {"message": "Refresh token revoked"}
@@ -29,5 +29,21 @@ class SignInTestCase(BaseAuthTestCase):
         assert response.json == {"message": "successfully changed"}
         response = self.client.post(self.sign_out_url, headers=self.headers_refresh)
         assert response.json == {"message": "Refresh token revoked"}
-        response = self.client.post(self.sign_in_url, json=USER_DATA | USER_NEW_PASSWORD)
+        response = self.client.post(self.sign_in_url, json=USER_DATA | {"password": USER_NEW_PASSWORD["new_password"]})
         assert response.status_code == HTTPStatus.OK
+
+    def test_change_password_with_invalid_password(self):
+        data = USER_NEW_PASSWORD.copy()
+        data["old_password"] = "invalid_password"
+        response = self.client.post(self.url, headers=self.headers, json=data)
+        assert response.status_code == HTTPStatus.CONFLICT
+        expected_response = {"message": "invalid password"}
+        assert response.json == expected_response
+
+    def test_change_password_without_old_password(self):
+        data = USER_NEW_PASSWORD.copy()
+        data.pop("old_password")
+        response = self.client.post(self.url, headers=self.headers, json=data)
+        assert response.status_code == HTTPStatus.CONFLICT
+        expected_response = {"message": "enter your old password"}
+        assert response.json == expected_response
