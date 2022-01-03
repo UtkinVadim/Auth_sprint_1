@@ -7,8 +7,14 @@ from flask_testing import TestCase
 from app import create_app, db, jwt, redis_client
 from app.models import Role, User, UserRole
 from app.tests.testing_data import USER_DATA
-from config import (TEST_DB, TEST_DB_HOST, TEST_DB_PASSWORD, TEST_DB_PORT,
-                    TEST_DB_USER)
+from config import (
+    TEST_DB,
+    TEST_DB_HOST,
+    TEST_DB_PASSWORD,
+    TEST_DB_PORT,
+    TEST_DB_USER,
+    TEST_REDIS_DB
+)
 
 
 class BaseAuthTestCase(TestCase):
@@ -26,6 +32,7 @@ class BaseAuthTestCase(TestCase):
         test_config = {
             "SQLALCHEMY_DATABASE_URI": self.SQLALCHEMY_DATABASE_URI,
             "TESTING": True,
+            "REDIS_DB": TEST_REDIS_DB
         }
         app = create_app(test_config)
         jwt.init_app(app)

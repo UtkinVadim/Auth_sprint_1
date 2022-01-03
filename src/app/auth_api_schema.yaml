@@ -25,16 +25,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/RequesrSigIn'
+            $ref: '#/definitions/RequestSignIn'
       responses:
         '200':
-          description: ''
+          description: 'OK'
           schema:
             $ref: '#/definitions/TokensResponse'
         '401':
-          description: ''
+          description: 'Пользователь с переданным логином/паролем не найден.'
           schema:
-            $ref: '#/definitions/Unauth'
+            $ref: '#/definitions/ResponseUnauth'
       tags:
         - User
     parameters: []
@@ -50,7 +50,7 @@ paths:
             $ref: '#/definitions/RequestSignOut'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/ResponseSignOut'
       tags:
@@ -65,16 +65,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Request'
+            $ref: '#/definitions/RequestSignUp'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
-            $ref: '#/definitions/ResponseOk'
+            $ref: '#/definitions/ResponseSignUpOk'
         '409':
-          description: ''
+          description: 'Пользователь с такими данными уже существует'
           schema:
-            $ref: '#/definitions/ResponseCONF'
+            $ref: '#/definitions/ResponseSignUpConflict'
       tags:
         - User
     parameters: []
@@ -85,9 +85,9 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'OK'
           schema:
-            $ref: '#/definitions/GetRole'
+            $ref: '#/definitions/ResponseGetRole'
       tags:
         - Access
     post:
@@ -101,11 +101,11 @@ paths:
             $ref: '#/definitions/RoleRequest'
       responses:
         '201':
-          description: ''
+          description: 'OK'
           schema:
             $ref: '#/definitions/RoleCreated'
         '409':
-          description: ''
+          description: 'Роль с переданным "title" уже существует.'
           schema:
             $ref: '#/definitions/RoleAlrExist'
       tags:
@@ -121,11 +121,11 @@ paths:
             $ref: '#/definitions/RolePatch'
       responses:
         '201':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/RoleUpdated'
         '409':
-          description: ''
+          description: 'Роли с переданным "title" не существует.'
           schema:
             $ref: '#/definitions/RoleNotExist'
       tags:
@@ -141,11 +141,11 @@ paths:
             $ref: '#/definitions/RoleRequest'
       responses:
         '201':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/RoleDeleted'
         '409':
-          description: ''
+          description: 'Роли с переданным "title" не существует.'
           schema:
             $ref: '#/definitions/RoleNotExist'
       tags:
@@ -160,16 +160,24 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/RequestCUP'
+            $ref: '#/definitions/RequestChangeUser'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/ResponseCPU'
-        '409':
-          description: ''
+            $ref: '#/definitions/ResponseChangeUserOK'
+        '400':
+          description: 'При зменении пароля необходимо передать текущий пароль.'
           schema:
-            $ref: '#/definitions/ResponseCONF'
+            $ref: '#/definitions/ResponseChangeUserBadRequest'
+        '401':
+          description: 'Переданный текущий пароль - неверный.'
+          schema:
+            $ref: '#/definitions/ResponseChangeUserUnauthorized'
+        '409':
+          description: 'Пользователь с такими данными уже существует'
+          schema:
+            $ref: '#/definitions/ResponseSignUpConflict'
       tags:
         - User
     parameters: []
@@ -180,7 +188,7 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/ResponseHistory'
       tags:
@@ -193,7 +201,7 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/TokensResponse'
       tags:
@@ -208,14 +216,14 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/RequestRM'
+            $ref: '#/definitions/RequestUserRole'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
-            $ref: '#/definitions/ResponseRMPost'
+            $ref: '#/definitions/ResponseUserRolePost'
         '409':
-          description: ''
+          description: 'У пользователя уже есть эта роль.'
           schema:
             $ref: '#/definitions/UserAlreadyHasRole'
       tags:
@@ -228,21 +236,21 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/RequestRM'
+            $ref: '#/definitions/RequestUserRole'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
-            $ref: '#/definitions/ResponseRMDelete'
+            $ref: '#/definitions/ResponseUserRoleDelete'
         '409':
-          description: ''
+          description: 'У пользователя нет роли, которую вы пытаетесь удалить.'
           schema:
             $ref: '#/definitions/UserHasNoRole'
       tags:
         - User
     parameters: []
 definitions:
-  RequesrSigIn:
+  RequestSignIn:
     required:
       - login
       - password
@@ -252,12 +260,10 @@ definitions:
         title: Login
         description: The user's login
         type: string
-        minLength: 1
       password:
         title: Password
         description: The user's password
         type: string
-        minLength: 1
   TokensResponse:
     required:
       - access_token
@@ -267,19 +273,16 @@ definitions:
       access_token:
         title: Access token
         type: string
-        minLength: 1
       refresh_token:
         title: Refresh token
         type: string
-        minLength: 1
-  Unauth:
+  ResponseUnauth:
     type: object
     properties:
       message:
         title: Message
         type: string
         default: invalid credentials
-        minLength: 1
   RequestSignOut:
     type: object
     properties:
@@ -294,8 +297,7 @@ definitions:
         title: Message
         type: string
         default: Refresh token revoked
-        minLength: 1
-  Request:
+  RequestSignUp:
     required:
       - login
       - password
@@ -306,43 +308,36 @@ definitions:
         title: Login
         description: The user's login
         type: string
-        minLength: 1
       password:
         title: Password
         description: The user's password
         type: string
-        minLength: 1
       first_name:
         title: First name
         description: The user's first_name
         type: string
-        minLength: 1
       last_name:
         title: Last name
         description: The user's last_name
         type: string
-        minLength: 1
       email:
         title: Email
         description: The user's email
         type: string
-        minLength: 1
-  ResponseOk:
+  ResponseSignUpOk:
     type: object
     properties:
       message:
         title: Message
         type: string
         default: user created successfully
-        minLength: 1
-  ResponseCONF:
+  ResponseSignUpConflict:
     type: object
     properties:
       message:
         title: Message
         type: string
         default: choose another login
-        minLength: 1
   UserAlreadyHasRole:
     type: object
     properties:
@@ -350,7 +345,6 @@ definitions:
         title: Message
         type: string
         default: user already has role
-        minLength: 1
   UserHasNoRole:
     type: object
     properties:
@@ -358,7 +352,6 @@ definitions:
         title: Message
         type: string
         default: user has no role
-        minLength: 1
   RoleModel:
     required:
       - id
@@ -368,12 +361,10 @@ definitions:
       id:
         title: Id
         type: string
-        minLength: 1
       title:
         title: Title
         type: string
-        minLength: 1
-  GetRole:
+  ResponseGetRole:
     required:
       - roles
     type: object
@@ -391,7 +382,6 @@ definitions:
         title: Title
         description: The role's title
         type: string
-        minLength: 1
   RoleCreated:
     type: object
     properties:
@@ -399,7 +389,6 @@ definitions:
         title: Message
         type: string
         default: role created
-        minLength: 1
   RoleAlrExist:
     type: object
     properties:
@@ -407,7 +396,6 @@ definitions:
         title: Message
         type: string
         default: role already exists
-        minLength: 1
   RolePatch:
     required:
       - title
@@ -418,12 +406,10 @@ definitions:
         title: Title
         description: The role's current title
         type: string
-        minLength: 1
       new_title:
         title: New title
         description: The role's new title
         type: string
-        minLength: 1
   RoleUpdated:
     type: object
     properties:
@@ -431,7 +417,6 @@ definitions:
         title: Message
         type: string
         default: role updated
-        minLength: 1
   RoleNotExist:
     type: object
     properties:
@@ -439,7 +424,6 @@ definitions:
         title: Message
         type: string
         default: role does not exist
-        minLength: 1
   RoleDeleted:
     type: object
     properties:
@@ -447,28 +431,42 @@ definitions:
         title: Message
         type: string
         default: role deleted
-        minLength: 1
-  RequestCUP:
+  RequestChangeUser:
     type: object
     properties:
       login:
         title: Login
         description: New user's login
         type: string
-        minLength: 1
-      password:
+      old_password:
+        title: Password
+        description: User password
+        type: string
+      new_password:
         title: Password
         description: New user's password
         type: string
-        minLength: 1
-  ResponseCPU:
+  ResponseChangeUserOK:
     type: object
     properties:
       message:
         title: Message
         type: string
         default: successfully changed
-        minLength: 1
+  ResponseChangeUserBadRequest:
+    type: object
+    properties:
+      message:
+        title: Message
+        type: string
+        default: enter your old password
+  ResponseChangeUserUnauthorized:
+    type: object
+    properties:
+      message:
+        title: Message
+        type: string
+        default: invalid password
   History:
     required:
       - event_date
@@ -483,11 +481,9 @@ definitions:
       fingerprint:
         title: Fingerprint
         type: string
-        minLength: 1
       user_id:
         title: User id
         type: string
-        minLength: 1
   ResponseHistory:
     required:
       - events
@@ -497,7 +493,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/History'
-  RequestRM:
+  RequestUserRole:
     required:
       - user_id
       - role_id
@@ -506,24 +502,20 @@ definitions:
       user_id:
         title: User id
         type: string
-        minLength: 1
       role_id:
         title: Role id
         type: string
-        minLength: 1
-  ResponseRMPost:
+  ResponseUserRolePost:
     type: object
     properties:
       message:
         title: Message
         type: string
         default: role added
-        minLength: 1
-  ResponseRMDelete:
+  ResponseUserRoleDelete:
     type: object
     properties:
       message:
         title: Message
         type: string
         default: role deleted
-        minLength: 1

@@ -7,7 +7,6 @@ from sqlalchemy.dialects.postgresql import BOOLEAN, UUID
 
 import config
 from app import db
-from config import SALT
 
 
 class User(db.Model):
@@ -32,7 +31,7 @@ class User(db.Model):
         :return:
         """
         user = User(**user_fields)
-        user.password = cls.password_hasher(user_fields["password"], SALT)
+        user.password = cls.password_hasher(user_fields["password"])
         if cls.is_login_exist(user_fields):
             return
         db.session.add(user)
@@ -51,7 +50,7 @@ class User(db.Model):
         password = user_fields["password"]
         user = User.query.filter_by(login=login).one_or_none()
         if user:
-            if user.password == cls.password_hasher(password, SALT):
+            if user.password == cls.password_hasher(password):
                 return user
             return
         return
@@ -71,8 +70,8 @@ class User(db.Model):
         user = User.query.filter_by(id=user_id).one_or_none()
         if login := user_fields["login"]:
             user.login = login
-        if password := user_fields["password"]:
-            user.password = cls.password_hasher(password, SALT)
+        if password := user_fields["new_password"]:
+            user.password = cls.password_hasher(password)
         db.session.commit()
 
     @classmethod
@@ -105,7 +104,7 @@ class User(db.Model):
 
     @classmethod
     def password_hasher(
-            cls, password: str, salt: Optional[str] = None, hash_name: str = "sha256", iterations: int = 100000,
+            cls, password: str, salt: str = config.SALT, hash_name: str = "sha256", iterations: int = 100000,
             encoding: str = "utf-8"
     ) -> str:
         """
@@ -119,8 +118,10 @@ class User(db.Model):
         :param encoding:
         :return:
         """
-        salt = salt or config.SALT
         password_salted_hash = hashlib.pbkdf2_hmac(
             hash_name, password.encode(encoding), salt.encode(encoding), iterations
         ).hex()
         return password_salted_hash
+
+    def check_password(self, password: str) -> bool:
+        return self.password == self.password_hasher(password)
