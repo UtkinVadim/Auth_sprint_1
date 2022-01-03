@@ -34,6 +34,7 @@ services:
       - POSTGRES_PORT=${TEST_DB_PORT}
       - REDIS_HOST=testing_redis_auth
       - REDIS_PORT=${TEST_REDIS_PORT}
+      - REDIS_DB=${TEST_REDIS_DB}
     depends_on:
       - testing_postgres_auth
       - testing_redis_auth

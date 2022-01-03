@@ -32,7 +32,6 @@ class BaseAuthTestCase(TestCase):
         test_config = {
             "SQLALCHEMY_DATABASE_URI": self.SQLALCHEMY_DATABASE_URI,
             "TESTING": True,
-            "REDIS_DB": TEST_REDIS_DB
         }
         app = create_app(test_config)
         jwt.init_app(app)
