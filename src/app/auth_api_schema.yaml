@@ -28,11 +28,11 @@ paths:
             $ref: '#/definitions/RequestSignIn'
       responses:
         '200':
-          description: ''
+          description: 'OK'
           schema:
             $ref: '#/definitions/TokensResponse'
         '401':
-          description: ''
+          description: 'Пользователь с переданным логином/паролем не найден.'
           schema:
             $ref: '#/definitions/ResponseUnauth'
       tags:
@@ -50,7 +50,7 @@ paths:
             $ref: '#/definitions/RequestSignOut'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/ResponseSignOut'
       tags:
@@ -68,11 +68,11 @@ paths:
             $ref: '#/definitions/RequestSignUp'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/ResponseSignUpOk'
         '409':
-          description: ''
+          description: 'Пользователь с такими данными уже существует'
           schema:
             $ref: '#/definitions/ResponseSignUpConflict'
       tags:
@@ -85,7 +85,7 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'OK'
           schema:
             $ref: '#/definitions/ResponseGetRole'
       tags:
@@ -101,11 +101,11 @@ paths:
             $ref: '#/definitions/RoleRequest'
       responses:
         '201':
-          description: ''
+          description: 'OK'
           schema:
             $ref: '#/definitions/RoleCreated'
         '409':
-          description: ''
+          description: 'Роль с переданным "title" уже существует.'
           schema:
             $ref: '#/definitions/RoleAlrExist'
       tags:
@@ -121,11 +121,11 @@ paths:
             $ref: '#/definitions/RolePatch'
       responses:
         '201':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/RoleUpdated'
         '409':
-          description: ''
+          description: 'Роли с переданным "title" не существует.'
           schema:
             $ref: '#/definitions/RoleNotExist'
       tags:
@@ -141,11 +141,11 @@ paths:
             $ref: '#/definitions/RoleRequest'
       responses:
         '201':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/RoleDeleted'
         '409':
-          description: ''
+          description: 'Роли с переданным "title" не существует.'
           schema:
             $ref: '#/definitions/RoleNotExist'
       tags:
@@ -166,8 +166,16 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/ResponseChangeUserOK'
+        '400':
+          description: 'При зменении пароля необходимо передать текущий пароль.'
+          schema:
+            $ref: '#/definitions/ResponseChangeUserBadRequest'
+        '401':
+          description: 'Переданный текущий пароль - неверный.'
+          schema:
+            $ref: '#/definitions/ResponseChangeUserUnauthorized'
         '409':
-          description: ''
+          description: 'Пользователь с такими данными уже существует'
           schema:
             $ref: '#/definitions/ResponseSignUpConflict'
       tags:
@@ -180,7 +188,7 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/ResponseHistory'
       tags:
@@ -193,7 +201,7 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/TokensResponse'
       tags:
@@ -211,11 +219,11 @@ paths:
             $ref: '#/definitions/RequestUserRole'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/ResponseUserRolePost'
         '409':
-          description: ''
+          description: 'У пользователя уже есть эта роль.'
           schema:
             $ref: '#/definitions/UserAlreadyHasRole'
       tags:
@@ -231,11 +239,11 @@ paths:
             $ref: '#/definitions/RequestUserRole'
       responses:
         '200':
-          description: ''
+          description: 'ОК'
           schema:
             $ref: '#/definitions/ResponseUserRoleDelete'
         '409':
-          description: ''
+          description: 'У пользователя нет роли, которую вы пытаетесь удалить.'
           schema:
             $ref: '#/definitions/UserHasNoRole'
       tags:
@@ -430,7 +438,11 @@ definitions:
         title: Login
         description: New user's login
         type: string
-      password:
+      old_password:
+        title: Password
+        description: User password
+        type: string
+      new_password:
         title: Password
         description: New user's password
         type: string
@@ -441,6 +453,20 @@ definitions:
         title: Message
         type: string
         default: successfully changed
+  ResponseChangeUserBadRequest:
+    type: object
+    properties:
+      message:
+        title: Message
+        type: string
+        default: enter your old password
+  ResponseChangeUserUnauthorized:
+    type: object
+    properties:
+      message:
+        title: Message
+        type: string
+        default: invalid password
   History:
     required:
       - event_date
