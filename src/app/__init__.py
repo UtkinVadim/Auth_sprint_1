@@ -35,4 +35,7 @@ def create_app(test_config: dict = None) -> Flask:
     for resource, url in urls:
         api.add_resource(resource, url)
 
+    swagger.init_app(app)
+    jwt.init_app(app)
+
     return app
